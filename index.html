@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tribal Mischief — Strategic Amplification</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --black:      #0e0c0a;
+    --gold:       #C8A96E;
+    --gold-light: #F5EDD8;
+    --gold-dim:   #8a7045;
+    --cream:      #F8F4EE;
+    --warm:       #ECE2D0;
+    --berry:      #6D2E46;
+    --berry-light:#A26769;
+    --mid:        #5A554E;
+    --text-light: #E8E0D4;
+    --sidebar-w:  210px;
+    --transition: 0.45s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--black);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: #090806;
+    border-right: 1px solid #1c1a17;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0;
+    z-index: 100;
+  }
+
+  .sidebar-brand {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 0 22px 24px;
+    border-bottom: 1px solid #1c1a17;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 18px 0;
+    scrollbar-width: none;
+  }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+
+  .nav-chapter {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+    transition: background var(--transition);
+  }
+
+  .nav-chapter-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 22px;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #4a4640;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  .nav-chapter.active .nav-chapter-label {
+    color: var(--gold);
+  }
+
+  .nav-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  .nav-slides {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.4s ease;
+  }
+
+  .nav-chapter.active .nav-slides {
+    max-height: 300px;
+  }
+
+  .nav-slide-btn {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    padding: 5px 22px 5px 36px;
+    font-size: 10px;
+    color: #3a3730;
+    transition: color 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    line-height: 1.4;
+  }
+
+  .nav-slide-btn.current {
+    color: var(--gold-light);
+  }
+
+  .nav-slide-btn:hover { color: #8a7a60; }
+
+  .sidebar-counter {
+    padding: 18px 22px 0;
+    border-top: 1px solid #1c1a17;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: #3a3730;
+  }
+
+  /* ── SLIDE COUNTER ── */
+  #slide-counter {
+    position: fixed;
+    top: 22px;
+    right: 28px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    color: #4a4640;
+    z-index: 100;
+  }
+
+  /* ── MAIN ── */
+  #main {
+    margin-left: var(--sidebar-w);
+    width: calc(100% - var(--sidebar-w));
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ── SLIDES ── */
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity var(--transition), transform var(--transition);
+    pointer-events: none;
+    padding: 60px 80px;
+  }
+
+  .slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+  }
+
+  .slide.exit {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+
+  /* ── SLIDE THEMES ── */
+  .slide-dark   { background: var(--black); }
+  .slide-cream  { background: var(--cream); }
+  .slide-warm   { background: var(--warm); }
+  .slide-berry  { background: var(--berry); }
+  .slide-charcoal { background: #1a1714; }
+
+  /* ── TYPOGRAPHY ── */
+  .eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 18px;
+  }
+
+  .slide-cream .eyebrow,
+  .slide-warm .eyebrow  { color: var(--berry); }
+
+  h1.hero {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(52px, 6vw, 88px);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+
+  .slide-cream h1.hero,
+  .slide-warm  h1.hero  { color: #1a1410; }
+  .slide-berry h1.hero  { color: var(--gold-light); }
+
+  h2.section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4vw, 58px);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--cream);
+  }
+
+  .slide-cream h2.section-title,
+  .slide-warm  h2.section-title { color: #1a1410; }
+
+  .italic { font-style: italic; }
+
+  .stat-giant {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(96px, 14vw, 180px);
+    font-weight: 300;
+    line-height: 0.9;
+    color: var(--gold);
+    letter-spacing: -0.03em;
+  }
+
+  .stat-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #6a6050;
+    margin-top: 12px;
+  }
+
+  .slide-cream .stat-label,
+  .slide-warm  .stat-label { color: #8a7060; }
+
+  p.body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.75;
+    color: #9a9080;
+    max-width: 480px;
+  }
+
+  .slide-cream p.body,
+  .slide-warm  p.body { color: #5a4e44; }
+  .slide-berry p.body { color: #d4b0a8; }
+
+  /* ── LAYOUTS ── */
+  .layout-center {
+    flex-direction: column;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .layout-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .layout-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .layout-thirds {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    width: 100%;
+  }
+
+  /* ── DIVIDER ── */
+  .gold-rule {
+    width: 48px;
+    height: 1px;
+    background: var(--gold);
+    margin: 8px 0;
+  }
+
+  .gold-rule.center { margin: 8px auto; }
+
+  /* ── PILL TAGS ── */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .pill {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid #2a2520;
+    border-radius: 100px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: #7a7060;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .slide-cream .pill { border-color: #d0c4b4; color: #7a6a58; }
+  .slide-berry .pill { border-color: #8a4050; color: #d4b0a8; }
+
+  /* ── PHASE CARDS ── */
+  .phase-card {
+    background: #131008;
+    border: 1px solid #221e18;
+    border-radius: 6px;
+    padding: 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.3s;
+  }
+
+  .phase-card:hover { border-color: #3a3020; }
+
+  .phase-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 11px;
+    letter-spacing: 0.28em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+  }
+
+  .phase-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--gold-light);
+    line-height: 1.2;
+  }
+
+  .phase-desc {
+    font-size: 12px;
+    color: #5a5040;
+    line-height: 1.6;
+  }
+
+  .phase-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: var(--gold-dim);
+    letter-spacing: 0.06em;
+    margin-top: 4px;
+  }
+
+  /* ── TRANSFORM TABLE ── */
+  .transform-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  .transform-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .transform-col-header {
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .transform-col-header.after { color: var(--gold); }
+
+  .transform-item {
+    font-size: 14px;
+    color: #4a4438;
+    line-height: 1.4;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+  }
+
+  .transform-item.after {
+    color: var(--gold-light);
+    font-style: normal;
+    font-weight: 500;
+  }
+
+  .transform-arrow-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    padding-top: 32px;
+  }
+
+  .t-arrow {
+    font-size: 14px;
+    color: var(--gold-dim);
+    opacity: 0.6;
+    height: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── ORBIT DIAGRAM ── */
+  .orbit-wrap {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    flex-shrink: 0;
+  }
+
+  .orbit-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--berry);
+    border: 1px solid #8a4050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    color: var(--gold-light);
+    line-height: 1.3;
+    z-index: 2;
+    padding: 10px;
+  }
+
+  .orbit-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    border: 1px solid #2a2520;
+  }
+
+  .orbit-node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: #131008;
+    border: 1px solid #2a2520;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* position 4 nodes at cardinal points */
+  .orbit-node:nth-child(1) { top: 5%; left: 50%; }
+  .orbit-node:nth-child(2) { top: 50%; left: 97%; }
+  .orbit-node:nth-child(3) { top: 95%; left: 50%; }
+  .orbit-node:nth-child(4) { top: 50%; left: 3%; }
+
+  /* ── QUOTE SLIDE ── */
+  .quote-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 3.5vw, 46px);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.35;
+    color: var(--gold-light);
+    max-width: 680px;
+    text-align: center;
+  }
+
+  .quote-attr {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-top: 28px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── AUDIENCE CARDS ── */
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  .audience-card {
+    background: var(--warm);
+    border-radius: 4px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .audience-icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .audience-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1a1410;
+    line-height: 1.3;
+  }
+
+  .audience-sub {
+    font-size: 11px;
+    color: #8a7a68;
+    margin-top: 3px;
+  }
+
+  /* ── PHASE TIMELINE ── */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    gap: 16px;
+    position: relative;
+  }
+
+  .timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 32px;
+    bottom: 0;
+    width: 1px;
+    background: #2a2520;
+  }
+
+  .timeline-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: #131008;
+    border: 1px solid #2a2520;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    color: var(--gold-dim);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .timeline-content {
+    padding: 6px 0 24px;
+  }
+
+  .timeline-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--gold-light);
+    margin-bottom: 4px;
+  }
+
+  .timeline-desc {
+    font-size: 12px;
+    color: #5a5040;
+    line-height: 1.5;
+  }
+
+  /* ── INVESTMENT DISPLAY ── */
+  .invest-range {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(44px, 6vw, 76px);
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .invest-sub {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #5a5040;
+    margin-top: 10px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── RETAINER BADGE ── */
+  .retainer-badge {
+    background: #131008;
+    border: 1px solid #2a2520;
+    border-radius: 6px;
+    padding: 20px 28px;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 20px;
+  }
+
+  .retainer-range {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: var(--gold-light);
+    font-weight: 300;
+  }
+
+  .retainer-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #5a5040;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* ── FOUR-PILLAR GRID ── */
+  .pillar-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    width: 100%;
+    max-width: 620px;
+  }
+
+  .pillar-card {
+    background: #131008;
+    border: 1px solid #221e18;
+    border-radius: 6px;
+    padding: 22px 24px;
+  }
+
+  .pillar-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .pillar-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--gold-light);
+    margin-bottom: 8px;
+  }
+
+  .pillar-desc {
+    font-size: 12px;
+    color: #5a5040;
+    line-height: 1.55;
+  }
+
+  /* ── CTA SLIDE ── */
+  .cta-next-step {
+    background: #131008;
+    border: 1px solid var(--gold-dim);
+    border-radius: 8px;
+    padding: 28px 36px;
+    max-width: 480px;
+    margin-top: 20px;
+  }
+
+  .cta-label {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 10px;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .cta-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--gold-light);
+    line-height: 1.4;
+    font-weight: 400;
+  }
+
+  /* ── DECORATIVE ── */
+  .deco-line {
+    position: absolute;
+    background: #1a1710;
+    pointer-events: none;
+  }
+
+  .corner-mark {
+    position: absolute;
+    bottom: 28px;
+    right: 28px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #2a2520;
+  }
+
+  /* ── NAV ARROWS ── */
+  .nav-arrow {
+    position: fixed;
+    bottom: 28px;
+    z-index: 90;
+    background: none;
+    border: 1px solid #2a2520;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #4a4640;
+    font-size: 14px;
+    transition: border-color 0.3s, color 0.3s;
+  }
+
+  .nav-arrow:hover { border-color: var(--gold-dim); color: var(--gold); }
+  .nav-arrow.prev { right: 76px; }
+  .nav-arrow.next { right: 28px; }
+
+  /* ── PROGRESS BAR ── */
+  #progress-bar {
+    position: fixed;
+    bottom: 0;
+    left: var(--sidebar-w);
+    right: 0;
+    height: 2px;
+    background: #1a1710;
+    z-index: 90;
+  }
+
+  #progress-fill {
+    height: 100%;
+    background: var(--gold-dim);
+    transition: width var(--transition);
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-brand">Tribal Mischief</div>
+  <div class="sidebar-nav" id="sidebar-nav"></div>
+  <div class="sidebar-counter" id="sidebar-counter">—</div>
+</nav>
+
+<!-- SLIDE COUNTER -->
+<div id="slide-counter">1 / 10</div>
+
+<!-- NAVIGATION ARROWS -->
+<button class="nav-arrow prev" onclick="navigate(-1)">←</button>
+<button class="nav-arrow next" onclick="navigate(1)">→</button>
+
+<!-- PROGRESS BAR -->
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CHAPTER 0: TITLE                        -->
+  <!-- ─────────────────────────────────────── -->
+
+  <!-- SLIDE 0: Title / Identity -->
+  <section class="slide slide-dark layout-center" data-chapter="Introduction" data-title="Who We Are" style="overflow:hidden;">
+    <!-- Decorative background texture -->
+    <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+      <!-- Large faint TM monogram -->
+      <div style="position:absolute;right:-60px;bottom:-80px;font-family:'Cormorant Garamond',serif;font-size:420px;font-weight:300;color:#141008;line-height:1;user-select:none;letter-spacing:-0.05em;">TM</div>
+      <!-- Thin horizontal rule across full width -->
+      <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,#1c1a17 30%,#1c1a17 70%,transparent);transform:translateY(-80px);"></div>
+    </div>
+
+    <!-- Content -->
+    <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:0;text-align:center;z-index:2;">
+      <!-- Wordmark -->
+      <div style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:28px;">Est. Strategic Amplification</div>
+
+      <h1 style="font-family:'Cormorant Garamond',serif;font-size:clamp(64px,9vw,118px);font-weight:300;line-height:0.95;color:var(--gold-light);letter-spacing:-0.02em;">Tribal<br><span style="color:var(--gold);font-style:italic;">Mischief</span></h1>
+
+      <div style="width:1px;height:48px;background:linear-gradient(to bottom,var(--gold-dim),transparent);margin:24px auto;"></div>
+
+      <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(16px,1.8vw,22px);color:#6a6050;font-style:italic;letter-spacing:0.06em;max-width:480px;line-height:1.5;">
+        Building storytelling, systems, and digital infrastructure<br>that allow exceptional organizations to be seen clearly.
+      </p>
+
+      <div style="margin-top:32px;display:flex;align-items:center;gap:20px;">
+        <div style="width:32px;height:1px;background:var(--gold-dim);opacity:0.4;"></div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.34em;text-transform:uppercase;color:#3a3428;">Where Art Finds Audience</div>
+        <div style="width:32px;height:1px;background:var(--gold-dim);opacity:0.4;"></div>
+      </div>
+
+      <!-- Three identity pillars -->
+      <div style="margin-top:40px;display:flex;gap:32px;align-items:flex-start;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="width:1px;height:24px;background:var(--gold-dim);opacity:0.3;"></div>
+          <div style="font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#3a3428;font-family:'DM Sans',sans-serif;">Narrative</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="width:1px;height:24px;background:var(--gold-dim);opacity:0.3;"></div>
+          <div style="font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#3a3428;font-family:'DM Sans',sans-serif;">Systems</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="width:1px;height:24px;background:var(--gold-dim);opacity:0.3;"></div>
+          <div style="font-size:9px;letter-spacing:0.24em;text-transform:uppercase;color:#3a3428;font-family:'DM Sans',sans-serif;">Amplification</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="corner-mark">Tribal Mischief</div>
+  </section>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CHAPTER 1: THE PROBLEM                  -->
+  <!-- ─────────────────────────────────────── -->
+
+  <!-- SLIDE 1: Hero -->
+  <section class="slide slide-dark layout-center" data-chapter="The Problem" data-title="The Gap">
+    <div class="eyebrow">Strategic Amplification</div>
+    <h1 class="hero">Exceptional work.<br><span class="italic" style="color:var(--gold)">Invisible presence.</span></h1>
+    <div class="gold-rule center" style="margin:4px auto;"></div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:17px;color:#5a5040;letter-spacing:0.06em;text-align:center;">The gap between who you are and how the world sees you.</p>
+    <div class="corner-mark">Tribal Mischief</div>
+  </section>
+
+  <!-- SLIDE 2: The gap visualized -->
+  <section class="slide slide-charcoal layout-split" data-chapter="The Problem" data-title="The Disconnect">
+    <div style="display:flex;flex-direction:column;gap:24px;align-items:flex-start;">
+      <div class="eyebrow">The reality</div>
+      <h2 class="section-title" style="font-style:italic;color:#5a5040;font-size:clamp(26px,3vw,40px);">
+        Outdated website.<br>Fragmented messaging.<br>Manual workflows.<br>Poor documentation.
+      </h2>
+      <div class="gold-rule"></div>
+      <p class="body" style="font-size:14px;color:#4a4438;">The systems meant to represent the work end up misrepresenting it entirely.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;">
+      <div class="eyebrow" style="color:#8a7060;">The result</div>
+      <h2 class="section-title" style="font-size:clamp(28px,3.2vw,48px);color:var(--gold-light);">A gap between who you <em>are</em> and how the world <em>sees</em> you.</h2>
+    </div>
+    <div class="corner-mark">01</div>
+  </section>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CHAPTER 2: THE IDEA                     -->
+  <!-- ─────────────────────────────────────── -->
+
+  <!-- SLIDE 3: Strategic Amplification defined -->
+  <section class="slide slide-berry layout-center" data-chapter="The Idea" data-title="Strategic Amplification">
+    <div class="eyebrow" style="color:var(--gold-light);opacity:0.7;">The core idea</div>
+    <h1 class="hero" style="font-size:clamp(42px,5.5vw,74px);color:var(--gold-light);">Strategic<br>Amplification</h1>
+    <div class="gold-rule center" style="background:rgba(200,169,110,0.4);"></div>
+    <p class="body" style="text-align:center;color:#d4b0a8;font-size:15px;max-width:460px;">
+      Not marketing. Not a website. A complete ecosystem that makes your work impossible to ignore.
+    </p>
+    <div class="corner-mark" style="color:#5a3040;">02</div>
+  </section>
+
+  <!-- SLIDE 4: Four Pillars -->
+  <section class="slide slide-dark layout-left" data-chapter="The Idea" data-title="Four Pillars">
+    <div class="eyebrow">What we build together</div>
+    <div class="pillar-grid">
+      <div class="pillar-card">
+        <div class="pillar-icon">📖</div>
+        <div class="pillar-title">Narrative Discovery</div>
+        <div class="pillar-desc">Identity, story, voice. Extracted from leadership and embedded into everything.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">📷</div>
+        <div class="pillar-title">Cultural Capture</div>
+        <div class="pillar-desc">Photography, film, and documentary assets that show the work as it truly is.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">⚙️</div>
+        <div class="pillar-title">Digital Infrastructure</div>
+        <div class="pillar-desc">Website, CMS, and editorial platform built around how your organization actually works.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-icon">🤖</div>
+        <div class="pillar-title">Amplification Engine</div>
+        <div class="pillar-desc">AI writing agents, content workflows, and automation that sustain momentum.</div>
+      </div>
+    </div>
+    <div class="corner-mark">03</div>
+  </section>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CHAPTER 3: WHO WE SERVE                 -->
+  <!-- ─────────────────────────────────────── -->
+
+  <!-- SLIDE 5: Who we serve -->
+  <section class="slide slide-warm layout-split" data-chapter="Who We Serve" data-title="Ideal Clients">
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <div class="eyebrow">Our clients</div>
+      <h2 class="section-title">Craft-driven<br>organizations.</h2>
+      <div class="gold-rule" style="background:var(--berry);opacity:0.5;"></div>
+      <p class="body">They care deeply about the quality of their work. They just need the world to see it.</p>
+    </div>
+    <div class="audience-grid">
+      <div class="audience-card">
+        <div class="audience-icon">🎭</div>
+        <div>
+          <div class="audience-name">Performance Venues</div>
+          <div class="audience-sub">Theaters & cultural institutions</div>
+        </div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🏛️</div>
+        <div>
+          <div class="audience-name">Architecture Firms</div>
+          <div class="audience-sub">Design studios & practices</div>
+        </div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🎨</div>
+        <div>
+          <div class="audience-name">Creative Studios</div>
+          <div class="audience-sub">Production & creative companies</div>
+        </div>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">🔬</div>
+        <div>
+          <div class="audience-name">Research Centers</div>
+          <div class="audience-sub">Innovation & mission-driven orgs</div>
+        </div>
+      </div>
+    </div>
+    <div class="corner-mark" style="color:#c0b4a4;">04</div>
+  </section>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CHAPTER 4: THE ENGAGEMENT               -->
+  <!-- ─────────────────────────────────────── -->
+
+  <!-- SLIDE 6: Engagement overview stats -->
+  <section class="slide slide-dark" data-chapter="The Engagement" data-title="Overview">
+    <div style="display:flex;gap:80px;align-items:center;width:100%;">
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div class="eyebrow">Engagement model</div>
+        <div class="stat-giant" style="font-size:clamp(80px,11vw,140px);">3–4</div>
+        <div class="stat-label">months</div>
+        <div style="margin-top:20px;" class="invest-range">$50k – $70k</div>
+        <div class="invest-sub">Typical engagement investment</div>
+        <div class="retainer-badge">
+          <div class="retainer-range">$750 – $2,500 / mo</div>
+          <div class="retainer-label">Ongoing stewardship retainer</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:#3a3428;margin-bottom:12px;font-style:italic;">Five phases of transformation</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-num">I</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Narrative & Identity Discovery</div>
+              <div class="timeline-desc">Leadership interviews, story extraction, brand voice architecture</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">II</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Visual & Cultural Capture</div>
+              <div class="timeline-desc">On-site production, photography, video, archival media library</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">III</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Digital Infrastructure Build</div>
+              <div class="timeline-desc">Website, CMS, editorial platform, event architecture</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">IV</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Amplification Engine</div>
+              <div class="timeline-desc">AI agents, content workflows, social automation</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-num">V</div>
+            <div class="timeline-content">
+              <div class="timeline-title">Organizational Adoption</div>
+              <div class="timeline-desc" style="padding-bottom:0;">Staff training, workflow documentation, leadership alignment</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="corner-mark">05</div>
+  </section>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CHAPTER 5: THE TRANSFORMATION           -->
+  <!-- ─────────────────────────────────────── -->
+
+  <!-- SLIDE 7: Before & After -->
+  <section class="slide slide-cream layout-left" data-chapter="The Transformation" data-title="Before & After">
+    <div class="eyebrow">The transformation</div>
+    <div class="transform-grid">
+      <div class="transform-col">
+        <div class="transform-col-header before">Before</div>
+        <div class="transform-item">Great craft, poor visibility</div>
+        <div class="transform-item">Unclear digital presence</div>
+        <div class="transform-item">Manual, reactive marketing</div>
+        <div class="transform-item">Inconsistent storytelling</div>
+        <div class="transform-item">Communication that misrepresents the work</div>
+      </div>
+      <div class="transform-arrow-col">
+        <div class="t-arrow">→</div>
+        <div class="t-arrow">→</div>
+        <div class="t-arrow">→</div>
+        <div class="t-arrow">→</div>
+        <div class="t-arrow">→</div>
+      </div>
+      <div class="transform-col">
+        <div class="transform-col-header after">After</div>
+        <div class="transform-item after">Clear identity and narrative</div>
+        <div class="transform-item after">Integrated digital home</div>
+        <div class="transform-item after">Automated, continuous amplification</div>
+        <div class="transform-item after">Systems that sustain momentum</div>
+        <div class="transform-item after">Organizations that feel more like themselves</div>
+      </div>
+    </div>
+    <div class="corner-mark" style="color:#c0b4a4;">06</div>
+  </section>
+
+  <!-- SLIDE 8: Quote / Success statement -->
+  <section class="slide slide-dark layout-center" data-chapter="The Transformation" data-title="What Success Feels Like">
+    <div class="eyebrow">The outcome</div>
+    <div class="quote-text">
+      "The invisible chains that once limited their visibility are gone."
+    </div>
+    <div class="gold-rule center" style="margin:20px auto;"></div>
+    <p style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#5a5040;text-align:center;max-width:520px;font-style:italic;">
+      Your story becomes clear. Your systems work together. Your audience finally understands the value of your work.
+    </p>
+    <div class="corner-mark">07</div>
+  </section>
+
+  <!-- ─────────────────────────────────────── -->
+  <!-- CHAPTER 6: THE VISION                   -->
+  <!-- ─────────────────────────────────────── -->
+
+  <!-- SLIDE 9: Philosophy & vision -->
+  <section class="slide slide-charcoal layout-split" data-chapter="The Vision" data-title="Why Tribal Mischief">
+    <div style="display:flex;flex-direction:column;gap:22px;">
+      <div class="eyebrow">The philosophy</div>
+      <h2 class="section-title" style="font-size:clamp(28px,3.5vw,52px);">Thoughtful<br>disruption.</h2>
+      <div class="gold-rule"></div>
+      <p class="body" style="font-size:14px;">
+        Organizations know what needs to change. The problem is change is hard. Small shifts in structure, story, and technology unlock entirely new possibilities.
+      </p>
+      <p class="body" style="font-size:14px;">
+        Technology should amplify human creativity — not replace it.
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;align-items:flex-end;text-align:right;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(60px,8vw,100px);font-weight:300;color:#2a2520;line-height:0.9;letter-spacing:-0.03em;pointer-events:none;">TM</div>
+      <div class="pill-group" style="justify-content:flex-end;">
+        <span class="pill">Narrative</span>
+        <span class="pill">Systems</span>
+        <span class="pill">Technology</span>
+        <span class="pill">Visual Media</span>
+        <span class="pill">Org. Change</span>
+      </div>
+    </div>
+    <div class="corner-mark">08</div>
+  </section>
+
+  <!-- SLIDE 10: CTA -->
+  <section class="slide slide-dark layout-center" data-chapter="The Vision" data-title="Next Step">
+    <div class="eyebrow">Where art finds audience</div>
+    <h1 class="hero" style="font-size:clamp(40px,5vw,68px);">Your craft<br>deserves to be<br><span class="italic" style="color:var(--gold)">seen clearly.</span></h1>
+    <div class="cta-next-step">
+      <div class="cta-label">Next step</div>
+      <div class="cta-text">A discovery conversation — to understand your story and where the gaps are.</div>
+    </div>
+    <div style="margin-top:16px;font-size:11px;letter-spacing:0.2em;color:#3a3428;text-transform:uppercase;font-family:'DM Sans',sans-serif;">tribalmischief.com</div>
+    <div class="corner-mark">09</div>
+  </section>
+
+</main>
+
+<script>
+  // ── DATA ──
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let current = 0;
+
+  // ── BUILD SIDEBAR ──
+  const chapters = {};
+  slides.forEach((s, i) => {
+    const ch = s.dataset.chapter;
+    const title = s.dataset.title;
+    if (!chapters[ch]) chapters[ch] = [];
+    chapters[ch].push({ index: i, title });
+  });
+
+  const nav = document.getElementById('sidebar-nav');
+
+  Object.entries(chapters).forEach(([name, items]) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-chapter';
+    btn.dataset.chapter = name;
+
+    const label = document.createElement('span');
+    label.className = 'nav-chapter-label';
+    label.innerHTML = `<span class="nav-dot"></span>${name}`;
+    btn.appendChild(label);
+
+    const slideList = document.createElement('div');
+    slideList.className = 'nav-slides';
+    items.forEach(item => {
+      const sb = document.createElement('button');
+      sb.className = 'nav-slide-btn';
+      sb.textContent = item.title;
+      sb.dataset.index = item.index;
+      sb.addEventListener('click', e => {
+        e.stopPropagation();
+        goTo(item.index);
+      });
+      slideList.appendChild(sb);
+    });
+    btn.appendChild(slideList);
+
+    btn.addEventListener('click', () => goTo(items[0].index));
+    nav.appendChild(btn);
+  });
+
+  // ── NAVIGATE ──
+  function goTo(idx) {
+    if (idx < 0 || idx >= slides.length) return;
+
+    const prev = slides[current];
+    prev.classList.remove('active');
+    prev.classList.add('exit');
+    setTimeout(() => prev.classList.remove('exit'), 500);
+
+    current = idx;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  window.navigate = function(dir) { goTo(current + dir); };
+
+  function updateUI() {
+    // counter
+    document.getElementById('slide-counter').textContent = `${current + 1} / ${slides.length}`;
+    document.getElementById('sidebar-counter').textContent = `${current + 1} of ${slides.length}`;
+
+    // progress
+    document.getElementById('progress-fill').style.width =
+      ((current + 1) / slides.length * 100) + '%';
+
+    // sidebar highlights
+    const curChapter = slides[current].dataset.chapter;
+    document.querySelectorAll('.nav-chapter').forEach(btn => {
+      const active = btn.dataset.chapter === curChapter;
+      btn.classList.toggle('active', active);
+    });
+    document.querySelectorAll('.nav-slide-btn').forEach(btn => {
+      btn.classList.toggle('current', +btn.dataset.index === current);
+    });
+  }
+
+  // ── KEYBOARD ──
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault(); navigate(1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault(); navigate(-1);
+    }
+  });
+
+  // ── INIT ──
+  slides[0].classList.add('active');
+  updateUI();
+</script>
+</body>
+</html>
