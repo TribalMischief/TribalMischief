@@ -3,601 +3,1143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Andrew Sidford Architects — Tribal Mischief</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Tribal Mischief — Strategic Amplification</title>
 <style>
-:root {
-  --gold:    #C8A96E;
-  --goldlt:  #F5EDD8;
-  --golddim: #8A7048;
-  --charcoal:#1a1a1a;
-  --dark:    #141410;
-  --cream:   #F8F6F2;
-  --off:     #F5F4F1;
-  --warm:    #E8E4DE;
-  --grey:    #6A6A64;
-  --white:   #FFFFFF;
-  --serif:   'Cormorant Garamond', Georgia, serif;
-  --sans:    'DM Sans', 'Helvetica Neue', Arial, sans-serif;
-  --sw:      190px;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { width: 100%; height: 100%; overflow: hidden; background: #000; font-family: var(--sans); -webkit-font-smoothing: antialiased; }
-#app { position: absolute; inset: 0; display: flex; }
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-/* SIDEBAR */
-#sidebar { width: var(--sw); flex-shrink: 0; background: #080808; border-right: 1px solid #181818; display: flex; flex-direction: column; padding: 22px 0; overflow: hidden; }
-.sb-brand { font-family: var(--serif); font-size: 8.5px; letter-spacing: .28em; text-transform: uppercase; color: var(--gold); padding: 0 18px 18px; border-bottom: 1px solid #181818; }
-.sb-scroll { flex: 1; overflow-y: auto; padding: 12px 0; scrollbar-width: none; }
-.sb-scroll::-webkit-scrollbar { display: none; }
-.ch { display: block; width: 100%; background: none; border: none; cursor: pointer; text-align: left; padding: 0; border-left: 2px solid transparent; transition: border-color .2s; }
-.ch.on { border-left-color: var(--gold); }
-.ch-inner { display: flex; align-items: center; gap: 8px; padding: 8px 18px; font-size: 9px; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: #404040; transition: color .2s; }
-.ch:hover .ch-inner, .ch.on .ch-inner { color: var(--gold); }
-.ch-n { font-family: var(--serif); font-size: 10px; color: #2a2a2a; min-width: 15px; }
-.ch.on .ch-n { color: var(--golddim); }
-.sb-foot { padding: 14px 18px 0; border-top: 1px solid #181818; font-size: 7.5px; letter-spacing: .1em; color: #282828; text-transform: uppercase; line-height: 1.7; }
+  /* ═══════════════════════════════════════
+     BRAND TOKENS — TM Brand Guide
+     Black #111111 · Gold #C8A96E · Gold-light #F5EDD8
+     Cream #F8F6F2 · Warm-grey #E8E4DE · Mid-grey #6A6A64
+     Text #1F1F1F
+     Berry #6D2E46 — TEXT ACCENT ONLY
+       Use for: emphasis on light backgrounds, eyebrow labels,
+       italic pull-quotes, table headers, decorative accents.
+       Never use as a background fill.
+  ═══════════════════════════════════════ */
+  :root {
+    --black:        #111111;
+    --black-deep:   #0a0a0a;
+    --gold:         #C8A96E;
+    --gold-light:   #F5EDD8;
+    --gold-muted:   #8a7045;
+    --cream:        #F8F6F2;
+    --warm-grey:    #E8E4DE;
+    --mid-grey:     #6A6A64;
+    --text-dark:    #1F1F1F;
+    --white:        #FFFFFF;
+    --berry:        #6D2E46;
+    --sidebar-w:    220px;
+    --transition:   0.35s cubic-bezier(0.4,0,0.2,1);
+  }
 
-/* CONTENT */
-#content { flex: 1; position: relative; overflow: hidden; transition: background .4s ease; }
-#counter { position: absolute; top: 16px; right: 20px; z-index: 20; font-family: var(--serif); font-size: 12px; letter-spacing: .08em; color: #444; pointer-events: none; }
-#counter.lt { color: #aaa; }
-#prog { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: #181818; z-index: 20; }
-#prog-fill { height: 100%; background: var(--gold); transition: width .4s ease; }
-.arr { position: absolute; bottom: 20px; z-index: 20; background: none; border: 1px solid #2a2a2a; color: #484848; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; transition: border-color .2s, color .2s; }
-.arr:hover { border-color: var(--gold); color: var(--gold); }
-.arr:disabled { opacity: .2; cursor: default; }
-#a-prev { left: 20px; }
-#a-next { left: 58px; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* SLIDES */
-.slide { position: absolute; inset: 0; opacity: 0; transform: translateX(28px); pointer-events: none; transition: opacity .42s ease, transform .42s ease; overflow: hidden; }
-.slide.on { opacity: 1; transform: translateX(0); pointer-events: auto; }
-.slide.out { opacity: 0; transform: translateX(-28px); }
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--black);
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
 
-/* TYPOGRAPHY */
-.eyebrow { font-size: 8.5px; letter-spacing: .32em; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; font-family: var(--sans); }
-.eyebrow.dk { color: var(--golddim); }
-.d-xl { font-family: var(--serif); font-weight: 700; line-height: 1.0; color: var(--white); font-size: clamp(44px,6vw,76px); }
-.d-lg { font-family: var(--serif); font-weight: 700; line-height: 1.0; color: var(--white); font-size: clamp(28px,4vw,50px); }
-.d-md { font-family: var(--serif); font-weight: 700; line-height: 1.0; color: var(--charcoal); font-size: clamp(22px,2.8vw,38px); }
-.body-t { font-family: var(--sans); font-weight: 300; font-size: clamp(12px,1.2vw,14px); line-height: 1.65; color: var(--warm); max-width: 520px; }
-.gbar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--gold); }
-.dots { position: absolute; display: grid; gap: 16px; opacity: .2; pointer-events: none; }
-.dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--gold); display: block; }
+  /* ═══════════════════════════════════════
+     SIDEBAR
+  ═══════════════════════════════════════ */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--black-deep);
+    border-right: 1px solid #1e1e1e;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 0;
+    z-index: 100;
+  }
 
-/* S1 */
-#s1 { background: var(--charcoal); }
-#s1 .si { padding: 48px 60px; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; }
-.cover-t { font-family: var(--serif); font-weight: 700; line-height: .92; font-size: clamp(48px,7vw,90px); color: var(--white); margin-bottom: 24px; }
-.cover-sub { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: clamp(14px,1.7vw,19px); color: var(--goldlt); }
-.cover-meta { position: absolute; bottom: 32px; left: 60px; right: 60px; border-top: 1px solid #2a2a2a; padding-top: 14px; display: flex; justify-content: space-between; font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: #3a3a3a; }
+  .sidebar-brand {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 11px;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 0 24px 28px;
+    border-bottom: 1px solid #1e1e1e;
+  }
 
-/* S2 */
-#s2 { background: var(--dark); }
-#s2 .si { height: 100%; padding: 48px 60px; position: relative; display: grid; grid-template-columns: 1fr 230px; gap: 48px; align-items: center; }
-.stat-box { border: 1px solid var(--golddim); padding: 28px 20px; text-align: center; background: rgba(200,169,110,.04); }
-.stat-n { font-family: var(--serif); font-weight: 700; color: var(--gold); font-size: clamp(56px,7vw,88px); line-height: 1; }
-.stat-l { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--golddim); margin-top: 10px; }
-.src { position: absolute; bottom: 24px; left: 60px; font-size: 9px; color: #333; font-style: italic; }
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 0;
+    scrollbar-width: none;
+  }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
 
-/* S3 */
-#s3 { background: var(--cream); }
-#s3 .si { padding: 40px 60px 44px; height: 100%; display: flex; flex-direction: column; }
-#s3 .bar-row { display: flex; gap: 12px; align-items: flex-end; flex: 1; margin-top: 24px; }
-.bc { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
-.bt { width: 100%; flex: 1; background: var(--warm); border-radius: 2px 2px 0 0; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; }
-.bc.asa .bt { background: rgba(200,169,110,.15); border: 1px solid var(--gold); }
-.bf { width: 100%; background: var(--gold); border-radius: 2px 2px 0 0; height: 0; transition: height 1.2s cubic-bezier(.4,0,.2,1); }
-.bf.asa-f { background: var(--charcoal); }
-.bn { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--grey); margin-top: 8px; text-align: center; }
-.bc.asa .bn { color: var(--charcoal); font-weight: 500; }
-.bs { font-family: var(--serif); font-size: 18px; font-weight: 700; color: var(--charcoal); margin-top: 2px; }
-.bc.asa .bs { color: var(--golddim); }
-.bench-note { margin-top: 10px; font-size: 8.5px; color: var(--grey); font-style: italic; }
+  .nav-chapter {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    padding: 0;
+  }
 
-/* S4 */
-#s4 { background: var(--off); }
-#s4 .si { padding: 38px 60px; height: 100%; display: flex; flex-direction: column; }
-.gap-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 20px; }
-.gc { padding: 14px 16px; border-radius: 2px; }
-.gc.m { background: #F5EAEA; border: 1px solid #DDBABA; }
-.gc.p { background: #FEF6E4; border: 1px solid #DDD0A0; }
-.gbadge { display: flex; align-items: center; gap: 5px; font-size: 7px; letter-spacing: .2em; text-transform: uppercase; font-weight: 500; margin-bottom: 6px; }
-.gbadge .dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
-.gc.m .gbadge { color: #7A2828; }
-.gc.m .dot { background: #7A2828; }
-.gc.p .gbadge { color: #8A6F1A; }
-.gc.p .dot { background: #C8A030; }
-.gi { font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--charcoal); line-height: 1.3; }
+  .nav-chapter-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #3a3a3a;
+    transition: color 0.2s;
+  }
 
-/* S5 */
-#s5 { background: var(--charcoal); }
-#s5 .si { padding: 44px 60px; height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 20px; }
-.tf-grid { display: grid; grid-template-columns: 1fr 30px 1fr; align-items: start; }
-.tc { padding: 18px 20px; }
-.tc.bef { background: #1e1a1a; border: 1px solid #2a2424; }
-.tc.aft { background: rgba(200,169,110,.06); border: 1px solid var(--golddim); }
-.tc-hdr { font-size: 7.5px; letter-spacing: .28em; text-transform: uppercase; margin-bottom: 12px; font-weight: 500; }
-.bef .tc-hdr { color: #6A3030; }
-.aft .tc-hdr { color: var(--gold); }
-.ti { font-size: 11.5px; font-weight: 300; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.04); display: flex; gap: 8px; line-height: 1.4; }
-.bef .ti { color: #7A6060; }
-.aft .ti { color: var(--goldlt); }
-.aft .ti .icon { color: var(--gold); }
-.tf-arr { display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 18px; }
+  .nav-chapter.active .nav-chapter-label { color: var(--gold); }
+  .nav-chapter:hover  .nav-chapter-label { color: #666; }
 
-/* S6 */
-#s6 { background: var(--cream); }
-#s6 .si { padding: 38px 60px 44px; height: 100%; display: flex; flex-direction: column; }
-.phases { display: grid; grid-template-columns: repeat(5,1fr); gap: 8px; margin-top: 20px; flex: 1; }
-.pc { display: flex; flex-direction: column; padding: 16px 12px; background: var(--white); border-top: 3px solid var(--gold); box-shadow: 0 1px 10px rgba(0,0,0,.05); }
-.pc.feat { background: var(--charcoal); }
-.pnum { font-family: var(--serif); font-size: 28px; font-weight: 700; color: var(--gold); line-height: 1; margin-bottom: 10px; }
-.pname { font-family: var(--serif); font-size: 12px; font-weight: 600; color: var(--charcoal); line-height: 1.25; margin-bottom: 7px; }
-.pc.feat .pname { color: var(--white); }
-.pdesc { font-size: 9.5px; font-weight: 300; color: var(--grey); line-height: 1.5; }
-.pc.feat .pdesc { color: #777; }
-.tl { display: flex; justify-content: space-between; margin-top: 10px; font-size: 8.5px; letter-spacing: .1em; color: var(--grey); text-transform: uppercase; }
+  .nav-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
 
-/* S7 */
-#s7 { background: var(--off); }
-#s7 .si { padding: 44px 60px; height: 100%; display: grid; grid-template-columns: 1fr 265px; gap: 18px; align-items: start; }
-.im { background: var(--charcoal); padding: 28px 34px; }
-.im-lbl { font-size: 8px; letter-spacing: .26em; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
-.im-price { font-family: var(--serif); font-weight: 700; color: var(--white); font-size: clamp(30px,3.8vw,48px); line-height: 1; margin-bottom: 6px; }
-.im-desc { font-size: 10.5px; font-weight: 300; color: #777; margin-bottom: 20px; }
-.im-div { height: 1px; background: #2a2a2a; margin-bottom: 14px; }
-.im-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #222; }
-.im-rn { font-size: 10.5px; font-weight: 300; color: var(--warm); }
-.im-rv { font-family: var(--serif); font-size: 12px; color: var(--gold); }
-.ir { display: flex; flex-direction: column; gap: 14px; }
-.ret { background: var(--gold); padding: 22px; }
-.ret-lbl { font-size: 7px; letter-spacing: .24em; text-transform: uppercase; color: var(--charcoal); margin-bottom: 8px; font-weight: 500; }
-.ret-price { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--charcoal); line-height: 1; }
-.ret-unit { font-size: 10px; color: #6A5020; margin-top: 3px; }
-.ret-note { font-size: 8.5px; color: #8A6010; margin-top: 8px; }
-.del { background: var(--white); padding: 18px 22px; border: 1px solid var(--warm); }
-.del-lbl { font-size: 7px; letter-spacing: .24em; text-transform: uppercase; color: var(--golddim); margin-bottom: 12px; font-weight: 500; }
-.di { display: flex; gap: 7px; align-items: center; font-size: 10.5px; font-weight: 300; color: var(--charcoal); padding: 4px 0; border-bottom: 1px solid var(--warm); }
-.di::before { content: '·'; color: var(--gold); font-size: 15px; line-height: 1; margin-top: -2px; }
+  .nav-slides {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.35s ease;
+  }
 
-/* S8 */
-#s8 { background: var(--cream); }
-#s8 .si { height: 100%; display: grid; grid-template-columns: 300px 1fr; }
-.lp { background: var(--charcoal); display: flex; flex-direction: column; justify-content: flex-end; padding: 46px 36px; position: relative; }
-.lp::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--gold); }
-.wt { font-family: var(--serif); font-weight: 700; font-size: clamp(34px,4.5vw,54px); color: var(--white); line-height: .95; margin-bottom: 22px; }
-.ws { font-family: var(--serif); font-style: italic; font-size: 14px; font-weight: 300; color: var(--goldlt); line-height: 1.5; }
-.rp { display: flex; flex-direction: column; justify-content: center; padding: 44px 50px; gap: 14px; }
-.dc { background: var(--white); padding: 16px 20px; border-left: 3px solid var(--gold); box-shadow: 0 1px 8px rgba(0,0,0,.05); }
-.dt { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--charcoal); margin-bottom: 5px; }
-.db { font-size: 11.5px; font-weight: 300; color: var(--grey); line-height: 1.5; }
+  .nav-chapter.active .nav-slides { max-height: 400px; }
 
-/* S9 */
-#s9 { background: var(--dark); }
-#s9 .si { height: 100%; display: grid; grid-template-columns: 1fr 1fr; }
-.al { padding: 44px 40px 44px 60px; display: flex; flex-direction: column; justify-content: center; border-right: 1px solid #202020; }
-.ar { padding: 44px 60px 44px 40px; display: flex; flex-direction: column; justify-content: center; gap: 12px; }
-.atag { display: inline-flex; align-items: center; background: rgba(200,169,110,.08); border: 1px solid var(--golddim); padding: 4px 11px; font-size: 7.5px; letter-spacing: .24em; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; width: fit-content; }
-.atitle { font-family: var(--serif); font-weight: 700; font-size: clamp(24px,3vw,38px); color: var(--white); line-height: 1.05; margin-bottom: 16px; }
-.adesc { font-size: 12.5px; font-weight: 300; color: var(--warm); line-height: 1.65; max-width: 380px; margin-bottom: 22px; }
-.flow { display: flex; flex-direction: column; }
-.fs { display: flex; align-items: flex-start; gap: 14px; position: relative; }
-.fs:not(:last-child)::after { content: ''; position: absolute; left: 15px; top: 32px; width: 2px; height: 20px; background: linear-gradient(to bottom,#333,transparent); }
-.fi { width: 32px; height: 32px; border-radius: 2px; background: rgba(200,169,110,.1); border: 1px solid var(--golddim); display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
-.fc { padding: 3px 0 18px; }
-.fl { font-family: var(--serif); font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 3px; }
-.fsub { font-size: 10.5px; font-weight: 300; color: var(--grey); line-height: 1.45; }
-.out-hdr { font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--golddim); margin-bottom: 4px; }
-.oc { background: rgba(200,169,110,.06); border: 1px solid #2a2824; border-left: 3px solid var(--gold); padding: 14px 16px; }
-.olbl { font-size: 7px; letter-spacing: .24em; text-transform: uppercase; color: var(--gold); margin-bottom: 6px; font-weight: 500; }
-.otitle { font-family: var(--serif); font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
-.odesc { font-size: 10.5px; font-weight: 300; color: var(--grey); line-height: 1.5; }
-.rep-hdr { font-size: 8.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--grey); margin-bottom: 8px; margin-top: 6px; }
-.rep { display: flex; flex-direction: column; gap: 7px; }
-.ri { display: flex; gap: 9px; align-items: center; font-size: 11px; font-weight: 300; color: #3e3e3e; }
-.rx { color: #4a2020; font-size: 13px; }
-.aint { border-top: 1px solid #1e1e1e; padding-top: 14px; font-size: 9.5px; font-weight: 300; color: var(--grey); line-height: 1.6; }
-.aint span { color: var(--golddim); }
+  .nav-slide-btn {
+    display: block;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    padding: 5px 24px 5px 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    color: #2e2e2e;
+    line-height: 1.4;
+    transition: color 0.2s;
+    position: relative;
+  }
 
-/* S10 */
-#s10 { background: var(--charcoal); }
-#s10 .si { padding: 40px 60px 46px; height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 20px; }
-.pcols { display: grid; grid-template-columns: 1fr 1.05fr 1.05fr; gap: 18px; align-items: start; }
-.pic { display: flex; flex-direction: column; gap: 10px; padding-right: 18px; border-right: 1px solid #282820; }
-.poc { display: flex; flex-direction: column; gap: 10px; padding: 0 8px; border-left: 1px solid #222; }
-.cbadge { font-size: 7px; letter-spacing: .22em; text-transform: uppercase; padding: 3px 9px; width: fit-content; font-weight: 500; margin-bottom: 2px; }
-.cbadge.inp  { color: var(--golddim); background: rgba(200,169,110,.08); border: 1px solid #3a3420; }
-.cbadge.out1 { color: var(--gold); background: rgba(200,169,110,.1); border: 1px solid var(--golddim); }
-.cbadge.out2 { color: #555; background: rgba(255,255,255,.02); border: 1px solid #2e2e2e; }
-.ctitle { font-family: var(--serif); font-size: 16px; font-weight: 700; color: var(--white); line-height: 1.15; margin-bottom: 4px; }
-.ctitle.dim { color: var(--warm); }
-.cdesc { font-size: 11px; font-weight: 300; color: var(--grey); line-height: 1.6; margin-bottom: 6px; }
-.fp { display: flex; align-items: flex-start; gap: 9px; padding: 9px 12px; font-size: 10.5px; font-weight: 300; line-height: 1.4; }
-.fp.g { background: rgba(200,169,110,.07); border: 1px solid #3a3420; color: var(--warm); }
-.fp.d { background: rgba(255,255,255,.02); border: 1px solid #222; color: #555; }
-.fp-i { flex-shrink: 0; }
-.fp.g .fp-i { color: var(--gold); }
-.fp.d .fp-i { color: #444; }
-.carr-g { text-align: center; color: var(--golddim); font-size: 18px; margin: 3px 0; }
-.carr-d { text-align: center; color: #333; font-size: 18px; margin: 3px 0; }
-.cfoot-g { font-size: 9.5px; font-weight: 300; color: var(--golddim); }
-.cfoot-d { font-size: 9.5px; font-weight: 300; color: #444; }
-.stag { display: inline-block; font-size: 6.5px; letter-spacing: .16em; text-transform: uppercase; color: #444; border: 1px solid #2e2e2e; padding: 2px 6px; margin-left: 5px; vertical-align: middle; }
-.out2-hdr { display: flex; align-items: center; gap: 6px; }
+  .nav-slide-btn::before {
+    content: '·';
+    position: absolute;
+    left: 28px;
+    color: inherit;
+  }
 
-/* S11 */
-#s11 { background: var(--charcoal); }
-#s11 .si { padding: 48px 60px; height: 100%; display: flex; flex-direction: column; justify-content: center; position: relative; }
-.cta-t { font-family: var(--serif); font-weight: 700; font-size: clamp(44px,6.5vw,78px); color: var(--white); line-height: .95; margin-bottom: 22px; }
-.cta-b { font-size: 13px; font-weight: 300; color: var(--warm); line-height: 1.65; max-width: 560px; margin-bottom: 42px; }
-.steps { display: flex; }
-.sti { display: flex; align-items: center; gap: 14px; }
-.sti + .sti { margin-left: 30px; padding-left: 30px; border-left: 1px solid #2a2a2a; }
-.stc { width: 32px; height: 32px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 15px; font-weight: 700; color: var(--charcoal); flex-shrink: 0; }
-.stl { font-size: 12.5px; font-weight: 300; color: var(--goldlt); }
-.contact { position: absolute; bottom: 28px; left: 60px; right: 60px; border-top: 1px solid #222; padding-top: 14px; display: flex; justify-content: space-between; font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase; color: #333; }
+  .nav-slide-btn.current { color: var(--gold); }
+  .nav-slide-btn:hover   { color: #666; }
+
+  .sidebar-footer {
+    padding: 20px 24px 0;
+    border-top: 1px solid #1a1a1a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    color: #2a2a2a;
+    letter-spacing: 0.1em;
+    line-height: 1.8;
+  }
+
+  /* ═══════════════════════════════════════
+     COUNTER & PROGRESS
+  ═══════════════════════════════════════ */
+  #counter {
+    position: fixed;
+    top: 24px; right: 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: #3a3a3a;
+    letter-spacing: 0.12em;
+    z-index: 200;
+  }
+
+  #counter .cur { color: var(--gold); font-weight: 400; }
+
+  #progress {
+    position: fixed;
+    bottom: 0;
+    left: var(--sidebar-w);
+    right: 0;
+    height: 2px;
+    background: #1a1a1a;
+    z-index: 200;
+  }
+
+  #progress-bar {
+    height: 100%;
+    background: var(--gold);
+    transition: width 0.4s ease;
+  }
+
+  /* ═══════════════════════════════════════
+     SLIDE STAGE
+  ═══════════════════════════════════════ */
+  #stage {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-w);
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    overflow: hidden;
+  }
+
+  .slide.active {
+    display: flex;
+    animation: slideIn 0.35s ease forwards;
+  }
+
+  .slide.leaving {
+    display: flex;
+    animation: slideOut 0.28s ease forwards;
+    pointer-events: none;
+  }
+
+  @keyframes slideIn  { from { opacity:0; transform:translateX(18px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes slideOut { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(-18px); } }
+
+  /* background variants */
+  .bg-black    { background: var(--black); }
+  .bg-deep     { background: #0d0d0d; }
+  .bg-cream    { background: var(--cream); }
+  .bg-warm     { background: var(--warm-grey); }
+  .bg-charcoal { background: #161614; }
+
+  /* Berry (#6D2E46) is a TEXT ACCENT only — never a background fill.
+     Used via: .eyebrow-dark, .t-hero.on-light em, .th-after, .td-arrow */
+
+  /* ═══════════════════════════════════════
+     LAYOUT CONTAINERS
+  ═══════════════════════════════════════ */
+  .l-center {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 64px 80px;
+  }
+
+  .l-left {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 64px 72px;
+  }
+
+  /* Split layout: 42% dark / 58% light */
+  .l-split { width: 100%; height: 100%; display: flex; }
+
+  .split-dark {
+    width: 42%;
+    flex-shrink: 0;
+    background: var(--black);
+    border-right: 1px solid #1e1e1e;
+    padding: 60px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .split-light {
+    flex: 1;
+    background: var(--cream);
+    padding: 60px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .split-warm {
+    flex: 1;
+    background: var(--warm-grey);
+    padding: 60px 48px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* ═══════════════════════════════════════
+     TYPOGRAPHY
+  ═══════════════════════════════════════ */
+
+  /* Eyebrow */
+  .eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .eyebrow-dark { color: var(--berry); }
+
+  /* Hero serif headings */
+  .t-hero {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-weight: 300;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--white);
+  }
+
+  /* on light bg */
+  .t-hero.on-light { color: var(--text-dark); }
+
+  /* Italic accent — gold on dark, berry on light */
+  .t-hero em { font-style: italic; color: var(--gold); }
+  .t-hero.on-light em { color: var(--berry); }
+
+  /* Size scale */
+  .t-xl  { font-size: clamp(52px, 7.5vw, 88px); }
+  .t-lg  { font-size: clamp(36px, 5vw, 58px);   }
+  .t-md  { font-size: clamp(26px, 3.5vw, 42px); }
+  .t-sm  { font-size: clamp(20px, 2.5vw, 28px); }
+
+  /* Body copy
+     ON DARK:  primary body = #888  (brand guide spec)
+     ON LIGHT: primary body = mid-grey #6A6A64
+  */
+  .body-copy {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: #888;
+    max-width: 540px;
+  }
+
+  .body-copy strong { color: var(--white); font-weight: 400; }
+
+  .body-copy.on-light { color: var(--mid-grey); }
+  .body-copy.on-light strong { color: var(--text-dark); }
+
+  /* Gold divider rule */
+  .gold-rule {
+    width: 48px;
+    height: 2px;
+    background: var(--gold);
+    flex-shrink: 0;
+  }
+
+  /* Corner metadata */
+  .corner-mark {
+    position: absolute;
+    bottom: 28px; right: 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #2a2a2a;
+  }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: CARD GRID (dark bg)
+  ═══════════════════════════════════════ */
+  .card-grid {
+    display: grid;
+    gap: 1px;
+    background: #1e1e1e;
+    width: 100%;
+    margin-top: 28px;
+  }
+
+  .card-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+
+  .card {
+    background: var(--black);
+    padding: 28px 28px 30px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-num {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.7;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--white);
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+
+  .card-body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: #555;   /* subtle but legible on #111 */
+    line-height: 1.75;
+  }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: TIMELINE (dark bg)
+  ═══════════════════════════════════════ */
+  .timeline { display: flex; flex-direction: column; width: 100%; }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 16px;
+    position: relative;
+  }
+
+  .tl-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 13px; top: 28px; bottom: 0;
+    width: 1px;
+    background: #1e1e1e;
+  }
+
+  .tl-num {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--black-deep);
+    border: 1px solid #2a2a2a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    color: var(--gold-muted);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .tl-content { padding: 3px 0 20px; }
+
+  .tl-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin-bottom: 3px;
+    line-height: 1.2;
+  }
+
+  .tl-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: BEFORE / AFTER TABLE
+     — lives on cream bg, full contrast
+  ═══════════════════════════════════════ */
+  .transform-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 28px;
+  }
+
+  .transform-table thead th {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    padding: 0 8px 14px 0;
+    border-bottom: 2px solid var(--text-dark);
+    text-align: left;
+  }
+
+  .th-before { color: var(--mid-grey); width: 43%; }
+  .th-arrow  { width: 14%; text-align: center; color: transparent; }
+  .th-after  { color: var(--berry); width: 43%; }
+
+  .transform-table tbody tr { border-bottom: 1px solid #D4CFC8; }
+
+  .transform-table tbody td {
+    padding: 14px 8px 14px 0;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    line-height: 1.35;
+    vertical-align: middle;
+  }
+
+  .td-before { color: var(--mid-grey);  font-style: italic; }
+  .td-arrow  { text-align: center; color: var(--berry); font-style: normal; font-size: 13px; opacity: 0.4; }
+  .td-after  { color: var(--text-dark); font-weight: 500; font-style: normal; }
+
+  .transform-table tbody tr:last-child td { border-bottom: none; }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: AUDIENCE CARDS (warm bg)
+  ═══════════════════════════════════════ */
+  .audience-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .audience-card {
+    background: var(--cream);
+    border: 1px solid #D4CEC6;
+    border-radius: 4px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .audience-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+
+  .audience-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-dark);
+    line-height: 1.3;
+  }
+
+  .audience-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--mid-grey);
+    margin-top: 2px;
+  }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: STAT / INVESTMENT
+  ═══════════════════════════════════════ */
+  .stat-hero {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(76px, 11vw, 140px);
+    font-weight: 300;
+    line-height: 0.9;
+    color: var(--gold);
+    letter-spacing: -0.03em;
+  }
+
+  .stat-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #555;
+    margin-top: 8px;
+  }
+
+  .invest-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 4.5vw, 58px);
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .invest-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #555;
+    margin-top: 5px;
+  }
+
+  .retainer-badge {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--black-deep);
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    padding: 16px 22px;
+    margin-top: 16px;
+  }
+
+  .retainer-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--gold-light);
+  }
+
+  .retainer-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: PILL TAGS
+  ═══════════════════════════════════════ */
+  .pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .pill {
+    display: inline-block;
+    padding: 5px 14px;
+    border: 1px solid #2e2e2e;
+    border-radius: 100px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: #555;
+  }
+
+  .pill.on-light { border-color: #C4BEB6; color: var(--mid-grey); }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: CTA BOX
+  ═══════════════════════════════════════ */
+  .cta-box {
+    background: var(--black-deep);
+    border: 1px solid var(--gold-muted);
+    border-radius: 6px;
+    padding: 26px 34px;
+    max-width: 500px;
+  }
+
+  .cta-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold-muted);
+    margin-bottom: 10px;
+  }
+
+  .cta-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
+    font-weight: 400;
+    color: var(--gold-light);
+    line-height: 1.45;
+  }
+
+  /* ═══════════════════════════════════════
+     NAV ARROWS
+  ═══════════════════════════════════════ */
+  .nav-arrow {
+    position: fixed;
+    bottom: 28px;
+    z-index: 190;
+    background: none;
+    border: 1px solid #2a2a2a;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #444;
+    font-size: 14px;
+    transition: border-color 0.25s, color 0.25s;
+  }
+
+  .nav-arrow:hover { border-color: var(--gold-muted); color: var(--gold); }
+  .nav-arrow.prev { right: 78px; }
+  .nav-arrow.next { right: 28px; }
 </style>
 </head>
 <body>
-<div id="app">
 
-  <nav id="sidebar">
-    <div class="sb-brand">Tribal Mischief</div>
-    <div class="sb-scroll" id="snav"></div>
-    <div class="sb-foot">Andrew Sidford Architects<br>Discovery Deck · 2025</div>
-  </nav>
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-brand">Tribal Mischief</div>
+  <div class="sidebar-nav" id="sidebar-nav"></div>
+  <div class="sidebar-footer" id="sidebar-footer">—</div>
+</nav>
 
-  <div id="content">
-    <div id="counter">1 / 11</div>
-    <div id="prog"><div id="prog-fill" style="width:9.09%"></div></div>
-    <button class="arr" id="a-prev" disabled>&#8592;</button>
-    <button class="arr" id="a-next">&#8594;</button>
+<!-- COUNTER -->
+<div id="counter"><span class="cur" id="cur-num">1</span> / <span id="tot-num">11</span></div>
 
-    <!-- S1 COVER -->
-    <section class="slide on" id="s1">
-      <div class="si">
-        <div class="gbar"></div>
-        <div class="dots" style="top:44px;right:44px;grid-template-columns:repeat(5,4px);grid-template-rows:repeat(6,4px)">
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
+<!-- NAV ARROWS -->
+<button class="nav-arrow prev" onclick="navigate(-1)">←</button>
+<button class="nav-arrow next" onclick="navigate(1)">→</button>
+
+<!-- PROGRESS -->
+<div id="progress"><div id="progress-bar"></div></div>
+
+<!-- ═══════════════════════════════════════
+     SLIDES
+═══════════════════════════════════════ -->
+<div id="stage">
+
+  <!-- ───────────────────────────────
+       CHAPTER: INTRODUCTION
+  ─────────────────────────────── -->
+
+  <!-- 1 · Title / Identity -->
+  <section class="slide bg-black" data-chapter="Introduction" data-title="Who We Are" style="overflow:hidden;">
+    <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+      <div style="position:absolute;right:-40px;bottom:-50px;font-family:'Cormorant Garamond',serif;font-size:360px;font-weight:300;color:#181614;line-height:1;user-select:none;letter-spacing:-0.05em;">TM</div>
+      <div style="position:absolute;left:0;right:0;top:calc(50% - 72px);height:1px;background:linear-gradient(to right,transparent,#1e1e1e 25%,#1e1e1e 75%,transparent);"></div>
+    </div>
+    <div class="l-center" style="position:relative;z-index:2;">
+      <div class="eyebrow" style="margin-bottom:28px;">Strategic Amplification for Craft-Driven Organizations</div>
+      <h1 class="t-hero t-xl" style="font-size:clamp(68px,10vw,120px);line-height:0.9;">
+        Tribal<br><em>Mischief</em>
+      </h1>
+      <div style="width:1px;height:42px;background:linear-gradient(to bottom,var(--gold-muted),transparent);margin:26px auto;opacity:0.7;"></div>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(16px,1.8vw,21px);color:#888;font-style:italic;letter-spacing:0.04em;max-width:500px;line-height:1.6;">
+        Building storytelling, systems, and digital infrastructure<br>that allow exceptional organizations to be seen clearly.
+      </p>
+      <div style="margin-top:28px;display:flex;align-items:center;gap:16px;">
+        <div style="width:28px;height:1px;background:var(--gold-muted);opacity:0.6;"></div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.34em;text-transform:uppercase;color:#7a7060;">Where Art Finds Audience</div>
+        <div style="width:28px;height:1px;background:var(--gold-muted);opacity:0.6;"></div>
+      </div>
+      <div style="margin-top:38px;display:flex;gap:36px;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="width:1px;height:18px;background:var(--gold-muted);opacity:0.5;"></div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#6a6050;">Narrative</div>
         </div>
-        <div class="eyebrow">Tribal Mischief · Strategic Amplification</div>
-        <div class="cover-t">Andrew<br>Sidford<br>Architects</div>
-        <div class="cover-sub"><em>A Proposal for Strategic Amplification</em></div>
-        <div class="cover-meta">
-          <span>Newburyport, Massachusetts</span>
-          <span>Prospect Discovery Deck · 2025</span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="width:1px;height:18px;background:var(--gold-muted);opacity:0.5;"></div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#6a6050;">Systems</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="width:1px;height:18px;background:var(--gold-muted);opacity:0.5;"></div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:#6a6050;">Amplification</div>
         </div>
       </div>
-    </section>
+    </div>
+    <div class="corner-mark">Tribal Mischief</div>
+  </section>
 
-    <!-- S2 PROBLEM -->
-    <section class="slide" id="s2">
-      <div class="si">
-        <div>
-          <div class="eyebrow">The Invisible Firm</div>
-          <div class="d-xl" style="margin-bottom:18px">Exceptional<br>architecture.<br><em style="color:var(--goldlt);font-style:italic">Hard to find online.</em></div>
-          <p class="body-t">Andrew Sidford Architects has spent decades delivering work that transforms spaces — and the lives lived inside them. But a firm of this caliber deserves a digital presence that matches that craft.</p>
-        </div>
-        <div class="stat-box">
-          <div class="stat-n">28</div>
-          <div class="stat-l">Features missing vs.<br>top competitors</div>
-        </div>
-        <div class="src">Source: Tribal Mischief competitive audit · 14 architecture firms benchmarked</div>
+  <!-- ───────────────────────────────
+       CHAPTER: THE PROBLEM
+  ─────────────────────────────── -->
+
+  <!-- 2 · The Gap -->
+  <section class="slide bg-black" data-chapter="The Problem" data-title="The Gap">
+    <div class="l-center">
+      <div class="eyebrow" style="margin-bottom:20px;">The challenge</div>
+      <h1 class="t-hero t-xl">Exceptional work.<br><em>Invisible presence.</em></h1>
+      <div class="gold-rule" style="margin:24px auto;"></div>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2vw,22px);color:#888;font-style:italic;text-align:center;max-width:520px;line-height:1.6;">
+        The gap between who you are and how the world perceives you.
+      </p>
+    </div>
+    <div class="corner-mark">01</div>
+  </section>
+
+  <!-- 3 · The Disconnect (split) -->
+  <section class="slide bg-black" data-chapter="The Problem" data-title="The Disconnect">
+    <div class="l-split">
+      <div class="split-dark">
+        <div class="eyebrow" style="margin-bottom:20px;">The reality</div>
+        <h2 class="t-hero t-md" style="font-style:italic;color:#555;line-height:1.35;margin-bottom:20px;">
+          Outdated website.<br>Fragmented messaging.<br>Manual workflows.<br>Poor documentation.
+        </h2>
+        <div class="gold-rule" style="margin-bottom:20px;"></div>
+        <p class="body-copy">The systems meant to represent the work end up <strong>misrepresenting it entirely.</strong></p>
       </div>
-    </section>
-
-    <!-- S3 BENCHMARK -->
-    <section class="slide" id="s3">
-      <div class="si">
-        <div class="eyebrow dk">Where ASA Stands Today</div>
-        <div class="d-md">A 14-firm competitive benchmark</div>
-        <div class="bar-row" id="barRow"></div>
-        <div class="bench-note">of 25 website features scored · Partial features count as 0.5</div>
+      <div class="split-light" style="background:#EDEBE6;">
+        <div class="eyebrow eyebrow-dark" style="margin-bottom:20px;">The result</div>
+        <h2 class="t-hero t-md on-light" style="line-height:1.25;">
+          A gap between who you <em>are</em> and how the world <em>sees</em> you.
+        </h2>
       </div>
-    </section>
+    </div>
+    <div class="corner-mark" style="color:#2a2a2a;">02</div>
+  </section>
 
-    <!-- S4 GAP -->
-    <section class="slide" id="s4">
-      <div class="si">
-        <div class="eyebrow dk">The Gap</div>
-        <div class="d-md" style="margin-bottom:20px">What every leading firm has — that ASA doesn't yet</div>
-        <div class="gap-grid">
-          <div class="gc m"><div class="gbadge"><div class="dot"></div>Missing</div><div class="gi">Homepage Value Proposition</div></div>
-          <div class="gc m"><div class="gbadge"><div class="dot"></div>Missing</div><div class="gi">Full-Bleed Hero Imagery or Film</div></div>
-          <div class="gc m"><div class="gbadge"><div class="dot"></div>Missing</div><div class="gi">Firm Philosophy &amp; Story Page</div></div>
-          <div class="gc m"><div class="gbadge"><div class="dot"></div>Missing</div><div class="gi">Filterable Portfolio</div></div>
-          <div class="gc m"><div class="gbadge"><div class="dot"></div>Missing</div><div class="gi">Contact / Enquiry Form</div></div>
-          <div class="gc m"><div class="gbadge"><div class="dot"></div>Missing</div><div class="gi">Video Project Walkthroughs</div></div>
-          <div class="gc m"><div class="gbadge"><div class="dot"></div>Missing</div><div class="gi">Client Testimonials</div></div>
-          <div class="gc p"><div class="gbadge"><div class="dot"></div>Partial</div><div class="gi">Mobile-Responsive Design</div></div>
-          <div class="gc p"><div class="gbadge"><div class="dot"></div>Partial</div><div class="gi">In-Depth Project Case Studies</div></div>
-        </div>
-      </div>
-    </section>
+  <!-- ───────────────────────────────
+       CHAPTER: THE IDEA
+  ─────────────────────────────── -->
 
-    <!-- S5 TRANSFORMATION -->
-    <section class="slide" id="s5">
-      <div class="si">
-        <div>
-          <div class="eyebrow">The Transformation</div>
-          <div class="d-lg">From hidden craft to undeniable presence</div>
-        </div>
-        <div class="tf-grid">
-          <div class="tc bef">
-            <div class="tc-hdr">Before</div>
-            <div class="ti"><span>—</span> No homepage value proposition</div>
-            <div class="ti"><span>—</span> Static, hard-to-navigate portfolio</div>
-            <div class="ti"><span>—</span> No firm story or design philosophy</div>
-            <div class="ti"><span>—</span> No mobile-responsive experience</div>
-            <div class="ti"><span>—</span> No client testimonials or social proof</div>
-            <div class="ti"><span>—</span> Score: 28% vs. leaders at 80%+</div>
-          </div>
-          <div class="tf-arr">→</div>
-          <div class="tc aft">
-            <div class="tc-hdr">After</div>
-            <div class="ti"><span class="icon">✦</span> A clear narrative that earns immediate trust</div>
-            <div class="ti"><span class="icon">✦</span> Filterable portfolio with deep case studies</div>
-            <div class="ti"><span class="icon">✦</span> A firm voice prospects feel before they call</div>
-            <div class="ti"><span class="icon">✦</span> Seamless on every device, every screen</div>
-            <div class="ti"><span class="icon">✦</span> Testimonials and press that close the gap</div>
-            <div class="ti"><span class="icon">✦</span> Automated content engine that keeps working</div>
-          </div>
-        </div>
-      </div>
-    </section>
+  <!-- 4 · Strategic Amplification (cream) -->
+  <section class="slide bg-cream" data-chapter="The Idea" data-title="Strategic Amplification">
+    <div class="l-center">
+      <div class="eyebrow eyebrow-dark" style="margin-bottom:20px;">The core idea</div>
+      <h1 class="t-hero t-xl on-light" style="font-size:clamp(46px,6.5vw,80px);">Strategic<br><em>Amplification</em></h1>
+      <div class="gold-rule" style="margin:24px auto;"></div>
+      <p class="body-copy on-light" style="text-align:center;max-width:480px;font-size:15px;">
+        Not marketing. Not a website.<br>A complete ecosystem that makes your work <strong>impossible to ignore.</strong>
+      </p>
+    </div>
+    <div class="corner-mark" style="color:#C0BCB6;">03</div>
+  </section>
 
-    <!-- S6 PROGRAM -->
-    <section class="slide" id="s6">
-      <div class="si">
-        <div class="eyebrow dk">The Program</div>
-        <div class="d-md">Strategic Amplification — 4 months, 5 phases</div>
-        <div class="phases">
-          <div class="pc"><div class="pnum">01</div><div class="pname">Narrative &amp; Identity</div><div class="pdesc">Story extraction, messaging architecture, brand voice</div></div>
-          <div class="pc"><div class="pnum">02</div><div class="pname">Visual &amp; Cultural Capture</div><div class="pdesc">On-site photography, video, archival media library</div></div>
-          <div class="pc feat"><div class="pnum">03</div><div class="pname">Digital Infrastructure</div><div class="pdesc">New website, CMS, portfolio architecture</div></div>
-          <div class="pc"><div class="pnum">04</div><div class="pname">Amplification Engine</div><div class="pdesc">Content workflows, social automation, AI writing tools</div></div>
-          <div class="pc"><div class="pnum">05</div><div class="pname">Org Adoption</div><div class="pdesc">Staff training, workflow docs, leadership alignment</div></div>
+  <!-- 5 · Four Pillars (dark card grid) -->
+  <section class="slide bg-black" data-chapter="The Idea" data-title="Four Pillars">
+    <div class="l-left">
+      <div class="eyebrow" style="margin-bottom:4px;">What we build together</div>
+      <div class="card-grid cols-2" style="max-width:680px;">
+        <div class="card">
+          <div class="card-num">01 — Narrative</div>
+          <div class="card-title">Narrative Discovery</div>
+          <div class="card-body">Identity, story, and voice — extracted from leadership and embedded into everything.</div>
         </div>
-        <div class="tl"><span>Month 1 – 2</span><span>Month 3 – 4</span></div>
-      </div>
-    </section>
-
-    <!-- S7 INVESTMENT -->
-    <section class="slide" id="s7">
-      <div class="si">
-        <div class="im">
-          <div class="im-lbl">Strategic Amplification Program</div>
-          <div class="im-price">$50,000 – $70,000</div>
-          <div class="im-desc">3–4 month engagement · All five phases included</div>
-          <div class="im-div"></div>
-          <div class="im-row"><span class="im-rn">Narrative &amp; Identity</span><span class="im-rv">$12k – $18k</span></div>
-          <div class="im-row"><span class="im-rn">Visual &amp; Cultural Capture</span><span class="im-rv">$12k – $20k</span></div>
-          <div class="im-row"><span class="im-rn">Digital Infrastructure</span><span class="im-rv">$20k – $30k</span></div>
-          <div class="im-row"><span class="im-rn">Amplification Engine</span><span class="im-rv">$8k – $15k</span></div>
+        <div class="card">
+          <div class="card-num">02 — Visual</div>
+          <div class="card-title">Cultural Capture</div>
+          <div class="card-body">Photography, film, and documentary assets that show the work as it truly is.</div>
         </div>
-        <div class="ir">
-          <div class="ret">
-            <div class="ret-lbl">Ongoing Stewardship</div>
-            <div class="ret-price">$750 – $2,500</div>
-            <div class="ret-unit">/ month</div>
-            <div class="ret-note">after engagement completes</div>
-          </div>
-          <div class="del">
-            <div class="del-lbl">What You Receive</div>
-            <div class="di">New website &amp; CMS</div>
-            <div class="di">Brand voice guide</div>
-            <div class="di">Professional media library</div>
-            <div class="di">Content engine + automation</div>
-            <div class="di">Staff-ready workflows</div>
-          </div>
+        <div class="card">
+          <div class="card-num">03 — Digital</div>
+          <div class="card-title">Digital Infrastructure</div>
+          <div class="card-body">Website, CMS, and editorial platform built around how your organization actually works.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">04 — Engine</div>
+          <div class="card-title">Amplification Engine</div>
+          <div class="card-body">AI writing agents, content workflows, and automation that sustain momentum.</div>
         </div>
       </div>
-    </section>
+    </div>
+    <div class="corner-mark">04</div>
+  </section>
 
-    <!-- S8 WHY US -->
-    <section class="slide" id="s8">
-      <div class="si">
-        <div class="lp">
-          <div class="wt">Why<br>Tribal<br>Mischief</div>
-          <div class="ws">We don't sell websites.<br>We build the systems<br>that make craft visible.</div>
-        </div>
-        <div class="rp">
-          <div class="dc"><div class="dt">We specialize in creative organizations</div><div class="db">Theaters, architects, studios, cultural institutions. We understand the specific way craft-driven firms earn trust — and we've built systems for exactly that.</div></div>
-          <div class="dc"><div class="dt">We build infrastructure, not campaigns</div><div class="db">Every engagement leaves you with systems that keep working — not deliverables that need replacing six months later when the agency contract ends.</div></div>
-          <div class="dc"><div class="dt">We start with your story, not our services</div><div class="db">The first phase is discovery. We listen before we build. The result feels like you, at your best — not like a template with your logo on it.</div></div>
-        </div>
+  <!-- ───────────────────────────────
+       CHAPTER: WHO WE SERVE
+  ─────────────────────────────── -->
+
+  <!-- 6 · Ideal Clients (split) -->
+  <section class="slide bg-black" data-chapter="Who We Serve" data-title="Ideal Clients">
+    <div class="l-split">
+      <div class="split-dark">
+        <div class="eyebrow" style="margin-bottom:20px;">Our clients</div>
+        <h2 class="t-hero t-lg" style="margin-bottom:20px;">Craft-driven<br>organizations.</h2>
+        <div class="gold-rule" style="margin-bottom:20px;"></div>
+        <p class="body-copy">They care deeply about the quality of their work. They just need the world to see it.</p>
       </div>
-    </section>
-
-    <!-- S9 VOICE AUTOMATION -->
-    <section class="slide" id="s9">
-      <div class="si">
-        <div class="al">
-          <div class="atag">Amplification Engine · Automation 01</div>
-          <div class="atitle">Voice-to-Text<br>Meeting Intelligence</div>
-          <div class="adesc">Every client conversation, site visit, and design review becomes a structured document — automatically filed, tagged, and ready to search. No transcription lag. No lost context.</div>
-          <div class="flow">
-            <div class="fs">
-              <div class="fi">🎙</div>
-              <div class="fc"><div class="fl">Meeting Recorded</div><div class="fsub">On-site, in-office, or over Zoom — any audio source captured</div></div>
+      <div class="split-warm">
+        <div class="eyebrow eyebrow-dark" style="margin-bottom:20px;">We work with</div>
+        <div class="audience-grid">
+          <div class="audience-card">
+            <div class="audience-icon">🎭</div>
+            <div>
+              <div class="audience-name">Performance Venues</div>
+              <div class="audience-sub">Theaters &amp; cultural institutions</div>
             </div>
-            <div class="fs">
-              <div class="fi">⚙️</div>
-              <div class="fc"><div class="fl">AI Transcription + Structuring</div><div class="fsub">Speaker-aware transcription, action items extracted, client project auto-tagged</div></div>
+          </div>
+          <div class="audience-card">
+            <div class="audience-icon">🏛️</div>
+            <div>
+              <div class="audience-name">Architecture Firms</div>
+              <div class="audience-sub">Design studios &amp; practices</div>
             </div>
-            <div class="fs">
-              <div class="fi">📁</div>
-              <div class="fc"><div class="fl">Delivered to File Server</div><div class="fsub">Formatted document routed directly into the correct client folder — no manual filing</div></div>
+          </div>
+          <div class="audience-card">
+            <div class="audience-icon">🎨</div>
+            <div>
+              <div class="audience-name">Creative Studios</div>
+              <div class="audience-sub">Production &amp; creative companies</div>
+            </div>
+          </div>
+          <div class="audience-card">
+            <div class="audience-icon">🔬</div>
+            <div>
+              <div class="audience-name">Research Centers</div>
+              <div class="audience-sub">Innovation &amp; mission-driven orgs</div>
             </div>
           </div>
         </div>
-        <div class="ar">
-          <div class="out-hdr">Output</div>
-          <div class="oc">
-            <div class="olbl">Primary Delivery</div>
-            <div class="otitle">Structured Client Document</div>
-            <div class="odesc">Timestamped transcript with auto-extracted summary, decisions made, and next actions — filed directly into your project management file server, associated with the correct client and engagement.</div>
-          </div>
-          <div class="rep-hdr">What this replaces</div>
-          <div class="rep">
-            <div class="ri"><span class="rx">✕</span> Manual note-taking during client meetings</div>
-            <div class="ri"><span class="rx">✕</span> Lost decisions from undocumented site visits</div>
-            <div class="ri"><span class="rx">✕</span> Hours spent organizing and filing summaries</div>
-          </div>
-          <div class="aint">Integrates with: <span>SharePoint · Google Drive · Dropbox · Notion</span></div>
+      </div>
+    </div>
+    <div class="corner-mark" style="color:#2a2a2a;">05</div>
+  </section>
+
+  <!-- ───────────────────────────────
+       CHAPTER: THE ENGAGEMENT
+  ─────────────────────────────── -->
+
+  <!-- 7 · Engagement Overview (dark, two-col) -->
+  <section class="slide bg-black" data-chapter="The Engagement" data-title="Overview">
+    <div style="width:100%;height:100%;display:flex;align-items:center;padding:60px 64px;gap:72px;">
+
+      <!-- Stats column -->
+      <div style="display:flex;flex-direction:column;flex-shrink:0;gap:0;">
+        <div class="eyebrow" style="margin-bottom:16px;">Engagement model</div>
+        <div class="stat-hero">3–4</div>
+        <div class="stat-label">months</div>
+        <div style="margin-top:22px;" class="invest-num">$50k – $70k</div>
+        <div class="invest-label">Typical engagement</div>
+        <div class="retainer-badge">
+          <div class="retainer-num">$750 – $2,500 / mo</div>
+          <div class="retainer-label">Ongoing stewardship retainer</div>
         </div>
       </div>
-    </section>
 
-    <!-- S10 PHOTO INTELLIGENCE -->
-    <section class="slide" id="s10">
-      <div class="si">
-        <div>
-          <div class="eyebrow">Amplification Engine · Automation 02</div>
-          <div class="d-lg">Photo Intelligence &amp; Project Publishing</div>
-        </div>
-        <div class="pcols">
-          <div class="pic">
-            <div class="cbadge inp">Input</div>
-            <div class="ctitle">Photos tagged to a project</div>
-            <div class="cdesc">Upload site photography, in-progress or finished build images. Associate with a project, phase, or client. That's the only step your team takes.</div>
-            <div class="fp g"><span class="fp-i">📷</span><span>Site, progress &amp; completion photography</span></div>
-            <div class="fp g"><span class="fp-i">🏷</span><span>Project, phase &amp; client association</span></div>
-            <div class="fp g"><span class="fp-i">⚡</span><span>Single upload triggers two parallel outputs</span></div>
-          </div>
-          <div class="poc">
-            <div class="cbadge out1">Output 01</div>
-            <div class="ctitle">Social Media Publication Pipeline</div>
-            <div class="cdesc">Images auto-captioned with project context, matched to your brand voice, and queued for review before publishing to Instagram or LinkedIn.</div>
-            <div class="fp g"><span class="fp-i">✦</span><span>AI-generated captions in ASA's voice</span></div>
-            <div class="fp g"><span class="fp-i">✦</span><span>Platform optimization &amp; hashtags</span></div>
-            <div class="fp g"><span class="fp-i">✦</span><span>One-click approval before posting</span></div>
-            <div class="carr-g">→</div>
-            <div class="cfoot-g">Instagram · LinkedIn · Editorial Calendar</div>
-          </div>
-          <div class="poc">
-            <div class="out2-hdr">
-              <div class="cbadge out2">Output 02</div>
-              <div class="stag">Stretch Goal</div>
+      <!-- Timeline column -->
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:#444;font-style:italic;margin-bottom:18px;">Five phases of transformation</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-num">I</div>
+            <div class="tl-content">
+              <div class="tl-title">Narrative &amp; Identity Discovery</div>
+              <div class="tl-desc">Leadership interviews, story extraction, brand voice architecture</div>
             </div>
-            <div class="ctitle dim">Automated Coffee Table Book</div>
-            <div class="cdesc">At project close, all photography and documentation compiles into a designed, print-ready book — a permanent record of the build, delivered to the client.</div>
-            <div class="fp d"><span class="fp-i">📖</span><span>Auto-assembled from project photo library</span></div>
-            <div class="fp d"><span class="fp-i">🖋</span><span>AI-authored project narrative per chapter</span></div>
-            <div class="fp d"><span class="fp-i">🎨</span><span>Branded layout, print-ready PDF output</span></div>
-            <div class="carr-d">→</div>
-            <div class="cfoot-d">Print-on-demand · Digital PDF · Client gift</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-num">II</div>
+            <div class="tl-content">
+              <div class="tl-title">Visual &amp; Cultural Capture</div>
+              <div class="tl-desc">On-site production, photography, video, archival media library</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-num">III</div>
+            <div class="tl-content">
+              <div class="tl-title">Digital Infrastructure Build</div>
+              <div class="tl-desc">Website, CMS, editorial platform, event architecture</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-num">IV</div>
+            <div class="tl-content">
+              <div class="tl-title">Amplification Engine</div>
+              <div class="tl-desc">AI agents, content workflows, social automation pipelines</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-num">V</div>
+            <div class="tl-content" style="padding-bottom:0;">
+              <div class="tl-title">Organizational Adoption</div>
+              <div class="tl-desc">Staff training, workflow documentation, leadership alignment</div>
+            </div>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- S11 NEXT STEPS -->
-    <section class="slide" id="s11">
-      <div class="si">
-        <div class="gbar"></div>
-        <div class="dots" style="top:36px;right:44px;grid-template-columns:repeat(5,4px);grid-template-rows:repeat(4,4px)">
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-          <span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <div class="eyebrow">Next Steps</div>
-        <div class="cta-t">Let's see if<br>this is a fit.</div>
-        <p class="cta-b">This work only succeeds when there's genuine alignment. We're not pitching you on a product — we're exploring whether Tribal Mischief is the right partner to help Andrew Sidford Architects be seen as clearly as it deserves to be.</p>
-        <div class="steps">
-          <div class="sti"><div class="stc">1</div><div class="stl">30-min discovery call</div></div>
-          <div class="sti"><div class="stc">2</div><div class="stl">Scoped proposal</div></div>
-          <div class="sti"><div class="stc">3</div><div class="stl">Engagement begins</div></div>
-        </div>
-        <div class="contact">
-          <span>tribalmischief.com</span>
-          <span>hello@tribalmischief.com</span>
+    </div>
+    <div class="corner-mark">06</div>
+  </section>
+
+  <!-- ───────────────────────────────
+       CHAPTER: THE TRANSFORMATION
+  ─────────────────────────────── -->
+
+  <!-- 8 · Before & After (CREAM — full contrast table) -->
+  <section class="slide bg-cream" data-chapter="The Transformation" data-title="Before &amp; After">
+    <div class="l-left" style="padding:56px 64px;">
+      <div class="eyebrow eyebrow-dark" style="margin-bottom:6px;">The transformation</div>
+      <h2 class="t-hero t-md on-light" style="margin-bottom:0;color:var(--text-dark);">Where organizations arrive. Where they leave.</h2>
+      <table class="transform-table">
+        <thead>
+          <tr>
+            <th class="th-before">Before</th>
+            <th class="th-arrow"> </th>
+            <th class="th-after">After</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-before">Great craft, poor visibility</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">Clear identity and narrative</td>
+          </tr>
+          <tr>
+            <td class="td-before">Unclear digital presence</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">Integrated digital home</td>
+          </tr>
+          <tr>
+            <td class="td-before">Manual, reactive marketing</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">Automated, continuous amplification</td>
+          </tr>
+          <tr>
+            <td class="td-before">Inconsistent storytelling</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">Systems that sustain momentum</td>
+          </tr>
+          <tr>
+            <td class="td-before">Communication that misrepresents the work</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">Organizations that feel more like themselves</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="corner-mark" style="color:#C0BCB6;">07</div>
+  </section>
+
+  <!-- 9 · What Success Feels Like (dark quote) -->
+  <section class="slide bg-black" data-chapter="The Transformation" data-title="What Success Feels Like">
+    <div class="l-center">
+      <div class="eyebrow" style="margin-bottom:24px;">The outcome</div>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(26px,3.8vw,48px);font-weight:300;font-style:italic;line-height:1.3;color:var(--gold-light);max-width:700px;text-align:center;">
+        "The invisible chains that once limited their visibility are gone."
+      </p>
+      <div class="gold-rule" style="margin:28px auto;"></div>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(15px,1.8vw,20px);color:#888;text-align:center;max-width:540px;font-style:italic;line-height:1.7;">
+        Their story becomes clear. Their systems work together.<br>Their audience finally understands the value of their work.
+      </p>
+    </div>
+    <div class="corner-mark">08</div>
+  </section>
+
+  <!-- ───────────────────────────────
+       CHAPTER: THE VISION
+  ─────────────────────────────── -->
+
+  <!-- 10 · Philosophy (split: dark / light) -->
+  <section class="slide bg-charcoal" data-chapter="The Vision" data-title="Why Tribal Mischief">
+    <div class="l-split">
+      <div class="split-dark" style="background:#161614;border-right-color:#222;">
+        <div class="eyebrow" style="margin-bottom:20px;">The philosophy</div>
+        <h2 class="t-hero t-lg" style="margin-bottom:20px;">Thoughtful<br>disruption.</h2>
+        <div class="gold-rule" style="margin-bottom:20px;"></div>
+        <p class="body-copy" style="margin-bottom:14px;">Organizations know what needs to change. The problem is change is hard. Small shifts in structure, story, and technology unlock entirely new possibilities.</p>
+        <p class="body-copy">Technology should <strong>amplify human creativity</strong> — not replace it.</p>
+      </div>
+      <div class="split-light" style="background:#EDEBE6;align-items:flex-end;justify-content:flex-end;padding-bottom:56px;text-align:right;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:clamp(64px,9vw,108px);font-weight:300;color:#D0CCC6;line-height:0.85;letter-spacing:-0.03em;margin-bottom:22px;">TM</div>
+        <div class="pill-group" style="justify-content:flex-end;">
+          <span class="pill on-light">Narrative</span>
+          <span class="pill on-light">Systems</span>
+          <span class="pill on-light">Technology</span>
+          <span class="pill on-light">Visual Media</span>
+          <span class="pill on-light">Org. Change</span>
         </div>
       </div>
-    </section>
+    </div>
+    <div class="corner-mark" style="color:#2a2a2a;">09</div>
+  </section>
 
-  </div>
-</div>
+  <!-- 11 · CTA -->
+  <section class="slide bg-black" data-chapter="The Vision" data-title="Next Step">
+    <div class="l-center">
+      <div class="eyebrow" style="margin-bottom:20px;">Where art finds audience</div>
+      <h1 class="t-hero t-xl" style="font-size:clamp(42px,5.5vw,70px);">
+        Your craft<br>deserves to be<br><em>seen clearly.</em>
+      </h1>
+      <div class="cta-box" style="margin-top:32px;">
+        <div class="cta-label">Next step</div>
+        <div class="cta-text">A discovery conversation — to understand your story and where the gaps are.</div>
+      </div>
+      <div style="margin-top:18px;font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#333;">tribalmischief.com</div>
+    </div>
+    <div class="corner-mark">10</div>
+  </section>
+
+</div><!-- /stage -->
 
 <script>
-const CHAPTERS = [
-  { id:'s1',  label:'Introduction',         bg:'#1a1a1a', lt:false },
-  { id:'s2',  label:'The Problem',          bg:'#141410', lt:false },
-  { id:'s3',  label:'The Benchmark',        bg:'#F8F6F2', lt:true  },
-  { id:'s4',  label:'The Gap',              bg:'#F5F4F1', lt:true  },
-  { id:'s5',  label:'The Transformation',   bg:'#1a1a1a', lt:false },
-  { id:'s6',  label:'The Program',          bg:'#F8F6F2', lt:true  },
-  { id:'s7',  label:'Investment',           bg:'#F5F4F1', lt:true  },
-  { id:'s8',  label:'Why Us',               bg:'#F8F6F2', lt:true  },
-  { id:'s9',  label:'Meeting Intelligence', bg:'#141410', lt:false },
-  { id:'s10', label:'Photo Intelligence',   bg:'#1a1a1a', lt:false },
-  { id:'s11', label:'Next Steps',           bg:'#1a1a1a', lt:false },
-];
-const BENCH = [
-  { n:'ASA', v:28, asa:true },{ n:'Olson Kundig',v:86 },{ n:'Studio Gang',v:80 },
-  { n:'Heatherwick',v:78 },{ n:'Foster +',v:76 },{ n:'Snøhetta',v:74 }
-];
-const N = CHAPTERS.length;
-let cur = 0, busy = false;
+  const slides = Array.from(document.querySelectorAll('#stage .slide'));
+  let current = 0;
+  let animating = false;
 
-// sidebar
-const snav = document.getElementById('snav');
-CHAPTERS.forEach((c,i) => {
-  const b = document.createElement('button');
-  b.className = 'ch' + (i===0?' on':'');
-  b.innerHTML = `<span class="ch-inner"><span class="ch-n">${String(i+1).padStart(2,'0')}</span>${c.label}</span>`;
-  b.addEventListener('click', () => go(i));
-  snav.appendChild(b);
-});
+  // ── BUILD SIDEBAR ──
+  const chapters = {};
+  slides.forEach((s, i) => {
+    const ch = s.dataset.chapter;
+    const title = s.dataset.title;
+    if (!chapters[ch]) chapters[ch] = [];
+    chapters[ch].push({ index: i, title });
+  });
 
-// bar chart
-const barRow = document.getElementById('barRow');
-BENCH.forEach(d => {
-  const el = document.createElement('div');
-  el.className = 'bc' + (d.asa?' asa':'');
-  el.innerHTML = `<div class="bt"><div class="bf${d.asa?' asa-f':''}" data-p="${d.v}"></div></div><div class="bn">${d.n}</div><div class="bs">${d.v}%</div>`;
-  barRow.appendChild(el);
-});
+  const nav = document.getElementById('sidebar-nav');
 
-function go(idx) {
-  if (busy || idx===cur || idx<0 || idx>=N) return;
-  busy = true;
-  const slides = document.querySelectorAll('.slide');
-  const btns   = document.querySelectorAll('.ch');
-  slides[cur].classList.remove('on'); slides[cur].classList.add('out');
-  btns[cur].classList.remove('on');
-  cur = idx;
-  const ch = CHAPTERS[cur];
-  slides[cur].classList.add('on'); btns[cur].classList.add('on');
-  document.getElementById('content').style.background = ch.bg;
-  const counter = document.getElementById('counter');
-  counter.textContent = `${cur+1} / ${N}`;
-  counter.classList.toggle('lt', ch.lt);
-  document.getElementById('prog-fill').style.width = `${((cur+1)/N)*100}%`;
-  document.getElementById('a-prev').disabled = cur===0;
-  document.getElementById('a-next').disabled = cur===N-1;
-  if (ch.id==='s3') setTimeout(() => { document.querySelectorAll('.bf').forEach(el=>{ el.style.height=el.dataset.p+'%'; }); }, 160);
-  setTimeout(() => { slides.forEach(s=>s.classList.remove('out')); busy=false; }, 460);
-  btns[cur].scrollIntoView({block:'nearest',behavior:'smooth'});
-}
+  Object.entries(chapters).forEach(([name, items]) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-chapter';
+    btn.dataset.chapter = name;
 
-document.addEventListener('keydown', e => {
-  if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); go(cur+1); }
-  if (['ArrowLeft','ArrowUp'].includes(e.key))        { e.preventDefault(); go(cur-1); }
-});
-document.getElementById('a-prev').addEventListener('click', () => go(cur-1));
-document.getElementById('a-next').addEventListener('click', () => go(cur+1));
-let tx=0;
-document.getElementById('content').addEventListener('touchstart', e=>{tx=e.touches[0].clientX;},{passive:true});
-document.getElementById('content').addEventListener('touchend',   e=>{const dx=e.changedTouches[0].clientX-tx; if(Math.abs(dx)>50) dx<0?go(cur+1):go(cur-1);});
+    const label = document.createElement('span');
+    label.className = 'nav-chapter-label';
+    label.innerHTML = `<span class="nav-dot"></span>${name}`;
+    btn.appendChild(label);
+
+    const list = document.createElement('div');
+    list.className = 'nav-slides';
+    items.forEach(item => {
+      const sb = document.createElement('button');
+      sb.className = 'nav-slide-btn';
+      sb.textContent = item.title;
+      sb.dataset.index = item.index;
+      sb.addEventListener('click', e => { e.stopPropagation(); goTo(item.index); });
+      list.appendChild(sb);
+    });
+    btn.appendChild(list);
+    btn.addEventListener('click', () => goTo(items[0].index));
+    nav.appendChild(btn);
+  });
+
+  // ── NAVIGATE ──
+  function goTo(idx) {
+    if (idx < 0 || idx >= slides.length || animating) return;
+    animating = true;
+
+    const prev = slides[current];
+    prev.classList.add('leaving');
+    prev.classList.remove('active');
+    setTimeout(() => prev.classList.remove('leaving'), 300);
+
+    current = idx;
+    slides[current].classList.add('active');
+    updateUI();
+    setTimeout(() => { animating = false; }, 380);
+  }
+
+  window.navigate = dir => goTo(current + dir);
+
+  function updateUI() {
+    const total = slides.length;
+    document.getElementById('cur-num').textContent = current + 1;
+    document.getElementById('tot-num').textContent = total;
+    document.getElementById('sidebar-footer').textContent = `${current + 1} of ${total}`;
+    document.getElementById('progress-bar').style.width = ((current + 1) / total * 100) + '%';
+
+    const curChapter = slides[current].dataset.chapter;
+    document.querySelectorAll('.nav-chapter').forEach(b => {
+      b.classList.toggle('active', b.dataset.chapter === curChapter);
+    });
+    document.querySelectorAll('.nav-slide-btn').forEach(b => {
+      b.classList.toggle('current', +b.dataset.index === current);
+    });
+  }
+
+  // ── KEYBOARD ──
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight','ArrowDown',' '].includes(e.key)) { e.preventDefault(); navigate(1); }
+    else if (['ArrowLeft','ArrowUp'].includes(e.key))   { e.preventDefault(); navigate(-1); }
+  });
+
+  // ── INIT ──
+  slides[0].classList.add('active');
+  updateUI();
 </script>
 </body>
 </html>
