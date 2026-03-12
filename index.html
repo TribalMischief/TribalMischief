@@ -654,6 +654,99 @@
   }
 
   /* ═══════════════════════════════════════
+     COMPONENT: WORKFLOW FLOW (vertical steps)
+  ═══════════════════════════════════════ */
+  .workflow-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    margin-top: 24px;
+  }
+  .workflow-step {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    color: var(--gold-light);
+    padding: 8px 20px;
+    text-align: center;
+  }
+  .workflow-arrow {
+    width: 1px;
+    height: 16px;
+    background: linear-gradient(to bottom, var(--gold-muted), transparent);
+    opacity: 0.6;
+  }
+  .workflow-flow .workflow-arrow:last-child { display: none; }
+
+  /* ═══════════════════════════════════════
+     COMPONENT: TEAM CARDS (dark bg)
+  ═══════════════════════════════════════ */
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+    margin-top: 20px;
+  }
+  .team-card {
+    background: var(--black-deep);
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .team-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--gold-light);
+    line-height: 1.2;
+  }
+  .team-role {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-muted);
+    margin-bottom: 2px;
+  }
+  .team-primary, .team-secondary {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 300;
+    color: #9a9a95;
+    line-height: 1.5;
+  }
+  .team-primary { font-weight: 400; color: #b0b0ab; }
+  .team-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--gold-muted);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .capability-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .capability-list li {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: #9a9a95;
+    line-height: 1.5;
+    margin-left: 18px;
+    list-style: disc;
+  }
+
+  /* ═══════════════════════════════════════
      NAV ARROWS
   ═══════════════════════════════════════ */
   .nav-arrow {
@@ -950,10 +1043,132 @@
   </section>
 
   <!-- ───────────────────────────────
+       CHAPTER: RESPONSIBILITIES (How We Work)
+  ─────────────────────────────── -->
+
+  <!-- 8 · Five Pillars of Tribal Mischief -->
+  <section class="slide bg-black" data-chapter="Responsibilities" data-title="Five Pillars">
+    <div class="l-left">
+      <div class="eyebrow" style="margin-bottom:4px;">The core capabilities</div>
+      <h2 class="t-hero t-md" style="margin-bottom:8px;">The Five Pillars of Tribal Mischief</h2>
+      <p class="body-copy" style="margin-bottom:0;max-width:600px;">Tribal Mischief operates at the intersection of <strong>storytelling, systems, and technology.</strong> Every engagement draws from five core activities.</p>
+      <div class="card-grid cols-2" style="max-width:720px;margin-top:24px;">
+        <div class="card">
+          <div class="card-num">01</div>
+          <div class="card-title">Systems &amp; Framework Design</div>
+          <div class="card-body">Designing the communication infrastructure that allows organizations to operate more intelligently.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">02</div>
+          <div class="card-title">Leadership &amp; Organizational Engagement</div>
+          <div class="card-body">Working directly with leadership teams to understand identity, challenges, and opportunities.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">03</div>
+          <div class="card-title">Narrative Architecture</div>
+          <div class="card-body">Crafting the story and positioning that allows an organization's work to be understood clearly.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">04</div>
+          <div class="card-title">Visual Storytelling</div>
+          <div class="card-body">Producing high-quality visual assets that document and represent the organization's work.</div>
+        </div>
+        <div class="card" style="grid-column: 1 / -1;">
+          <div class="card-num">05</div>
+          <div class="card-title">Technology &amp; AI Exploration</div>
+          <div class="card-body">Integrating emerging tools such as AI to improve communication workflows and operational efficiency.</div>
+        </div>
+      </div>
+      <p class="body-copy" style="margin-top:20px;font-size:12px;color:var(--gold-muted);">These five pillars form the <strong style="color:var(--gold-light);">Strategic Amplification System.</strong></p>
+    </div>
+    <div class="corner-mark">07</div>
+  </section>
+
+  <!-- 9 · Strategic Amplification Workflow -->
+  <section class="slide bg-black" data-chapter="Responsibilities" data-title="Engagement Flow">
+    <div class="l-center">
+      <div class="eyebrow" style="margin-bottom:20px;">How we work</div>
+      <h1 class="t-hero t-lg">The Strategic Amplification Workflow</h1>
+      <p class="body-copy" style="text-align:center;margin-top:16px;margin-bottom:0;">Each engagement moves through a clear sequence.</p>
+      <div class="workflow-flow">
+        <div class="workflow-step">Leadership Engagement</div>
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step">Narrative Discovery</div>
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step">Visual Documentation</div>
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step">Systems &amp; Infrastructure</div>
+        <div class="workflow-arrow"></div>
+        <div class="workflow-step">Amplification &amp; AI Tools</div>
+      </div>
+      <p class="body-copy" style="text-align:center;margin-top:28px;max-width:480px;font-size:13px;">This structure ensures that <strong>identity, storytelling, and technology remain aligned.</strong></p>
+    </div>
+    <div class="corner-mark">08</div>
+  </section>
+
+  <!-- 10 · Team Model -->
+  <section class="slide bg-black" data-chapter="Responsibilities" data-title="Team Model">
+    <div class="l-left">
+      <div class="eyebrow" style="margin-bottom:4px;">A collaborative studio</div>
+      <h2 class="t-hero t-md" style="margin-bottom:8px;">The Tribal Mischief Team Model</h2>
+      <p class="body-copy" style="margin-bottom:0;max-width:560px;">Each partner leads a specific domain of expertise—combining <strong>strategy, storytelling, technology, and media production</strong> within a single engagement.</p>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-name">Aidan Lewis</div>
+          <div class="team-role">Technical Lead</div>
+          <div class="team-primary">Systems and framework design; digital infrastructure and workflows</div>
+          <div class="team-secondary">AI tools and emerging technologies</div>
+          <div class="team-tagline">Durable, scalable, and technically sound.</div>
+        </div>
+        <div class="team-card">
+          <div class="team-name">Ethan Baird</div>
+          <div class="team-role">Narrative &amp; Client Strategy Lead</div>
+          <div class="team-primary">Leadership engagement; sales and relationship development; narrative and identity</div>
+          <div class="team-secondary">AI integration and future tools</div>
+          <div class="team-tagline">Understanding the organization and translating its craft into story.</div>
+        </div>
+        <div class="team-card">
+          <div class="team-name">Cole Crucial</div>
+          <div class="team-role">Creative Production Lead</div>
+          <div class="team-primary">Photography, video, and visual documentation</div>
+          <div class="team-tagline">Professional storytelling and visual clarity.</div>
+        </div>
+        <div class="team-card">
+          <div class="team-name">Sean McCarthy</div>
+          <div class="team-role">Organizational Engagement Lead</div>
+          <div class="team-primary">Leadership and internal teams after kickoff; adoption and implementation</div>
+          <div class="team-secondary">Collaborates with Ethan on narrative and identity</div>
+          <div class="team-tagline">Systems and narratives understood and adopted internally.</div>
+        </div>
+      </div>
+    </div>
+    <div class="corner-mark">09</div>
+  </section>
+
+  <!-- 11 · Why This Structure Works -->
+  <section class="slide bg-charcoal" data-chapter="Responsibilities" data-title="Why This Works">
+    <div class="l-left">
+      <div class="eyebrow" style="margin-bottom:4px;">A complete team</div>
+      <h2 class="t-hero t-md" style="margin-bottom:12px;">A Complete Strategic Amplification Team</h2>
+      <p class="body-copy" style="margin-bottom:16px;">Most organizations hire multiple vendors to accomplish this work:</p>
+      <ul class="capability-list" style="max-width:420px;">
+        <li>Brand consultants</li>
+        <li>Web developers</li>
+        <li>Marketing agencies</li>
+        <li>Production companies</li>
+        <li>Technology consultants</li>
+      </ul>
+      <p class="body-copy" style="margin-top:20px;">Tribal Mischief integrates these capabilities into <strong>a single collaborative team.</strong></p>
+      <p class="body-copy" style="margin-top:12px;">By combining narrative strategy, leadership engagement, technical infrastructure, visual storytelling, and emerging technology, we help organizations build communication systems that <strong>truly represent the quality of their work.</strong></p>
+    </div>
+    <div class="corner-mark" style="color:#6a6560;">10</div>
+  </section>
+
+  <!-- ───────────────────────────────
        CHAPTER: THE TRANSFORMATION
   ─────────────────────────────── -->
 
-  <!-- 8 · Before & After (CREAM — full contrast table) -->
+  <!-- 12 · Before & After (CREAM — full contrast table) -->
   <section class="slide bg-cream" data-chapter="The Transformation" data-title="Before &amp; After">
     <div class="l-left" style="padding:56px 64px;">
       <div class="eyebrow eyebrow-dark" style="margin-bottom:6px;">The transformation</div>
@@ -995,10 +1210,10 @@
         </tbody>
       </table>
     </div>
-    <div class="corner-mark" style="color:#C0BCB6;">07</div>
+    <div class="corner-mark" style="color:#6a6560;">11</div>
   </section>
 
-  <!-- 9 · What Success Feels Like (dark quote) -->
+  <!-- What Success Feels Like (dark quote) -->
   <section class="slide bg-black" data-chapter="The Transformation" data-title="What Success Feels Like">
     <div class="l-center">
       <div class="eyebrow" style="margin-bottom:24px;">The outcome</div>
@@ -1010,7 +1225,7 @@
         Their story becomes clear. Their systems work together.<br>Their audience finally understands the value of their work.
       </p>
     </div>
-    <div class="corner-mark">08</div>
+    <div class="corner-mark">12</div>
   </section>
 
   <!-- ───────────────────────────────
@@ -1038,10 +1253,10 @@
         </div>
       </div>
     </div>
-    <div class="corner-mark" style="color:#2a2a2a;">09</div>
+    <div class="corner-mark" style="color:#6a6560;">13</div>
   </section>
 
-  <!-- 11 · CTA -->
+  <!-- CTA -->
   <section class="slide bg-black" data-chapter="The Vision" data-title="Next Step">
     <div class="l-center">
       <div class="eyebrow" style="margin-bottom:20px;">Where art finds audience</div>
@@ -1054,7 +1269,7 @@
       </div>
       <div style="margin-top:18px;font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:#333;">tribalmischief.com</div>
     </div>
-    <div class="corner-mark">10</div>
+    <div class="corner-mark">14</div>
   </section>
 
 </div><!-- /stage -->
