@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tribal Mischief — Where Art Finds Audience</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  /* ══════════════════════════════════════════
+     BRAND TOKENS v1.1
+     Black #111111 · Gold #C8A96E · Gold-light #F5EDD8
+     Teal #2A4A5E · Teal-light #D4E4ED
+     Cream #F8F6F2 · Warm-grey #E8E4DE · Mid-grey #6A6A64
+     Text #1F1F1F
+  ══════════════════════════════════════════ */
+  :root {
+    --black:      #111111;
+    --black-deep: #0a0a0a;
+    --gold:       #C8A96E;
+    --gold-light: #F5EDD8;
+    --teal:       #2A4A5E;
+    --teal-lt:    #D4E4ED;
+    --cream:      #F8F6F2;
+    --warm-grey:  #E8E4DE;
+    --mid-grey:   #6A6A64;
+    --text:       #1F1F1F;
+    --white:      #FFFFFF;
+    --sidebar-w:  220px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: var(--cream);
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ══ SIDEBAR ══ */
+  #sidebar {
+    position: fixed; top: 0; left: 0;
+    width: var(--sidebar-w); height: 100vh;
+    background: var(--black-deep);
+    border-right: 1px solid #1e1e1e;
+    display: flex; flex-direction: column;
+    padding: 32px 0; z-index: 100;
+  }
+
+  .sidebar-brand {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--gold);
+    padding: 0 24px 28px;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  .sidebar-nav { flex: 1; overflow-y: auto; padding: 20px 0; scrollbar-width: none; }
+  .sidebar-nav::-webkit-scrollbar { display: none; }
+
+  .nav-chapter { display: block; width: 100%; background: none; border: none; cursor: pointer; text-align: left; padding: 0; }
+
+  .nav-chapter-label {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 24px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+    color: #7a7a75; transition: color 0.2s;
+  }
+
+  .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .nav-chapter.active .nav-chapter-label { color: var(--gold); }
+  .nav-chapter:hover  .nav-chapter-label { color: #aaa; }
+
+  .nav-slides { overflow: hidden; max-height: 0; transition: max-height 0.35s ease; }
+  .nav-chapter.active .nav-slides { max-height: 500px; }
+
+  .nav-slide-btn {
+    display: block; width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+    padding: 5px 24px 5px 40px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10px; font-weight: 300; letter-spacing: 0.04em;
+    color: #7a7a75; line-height: 1.4; transition: color 0.2s; position: relative;
+  }
+  .nav-slide-btn::before { content: '·'; position: absolute; left: 28px; color: inherit; }
+  .nav-slide-btn.current { color: var(--gold); }
+  .nav-slide-btn:hover   { color: #bbb; }
+
+  .sidebar-footer {
+    padding: 20px 24px 0;
+    border-top: 1px solid #1a1a1a;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 9px; color: #7a7a75; letter-spacing: 0.1em; line-height: 1.8;
+  }
+
+  /* ══ COUNTER & PROGRESS ══ */
+  #counter {
+    position: fixed; top: 24px; right: 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px; font-weight: 300; color: var(--mid-grey); letter-spacing: 0.12em; z-index: 200;
+  }
+  #counter .cur { color: var(--gold); font-weight: 400; }
+
+  #progress { position: fixed; bottom: 0; left: var(--sidebar-w); right: 0; height: 2px; background: var(--warm-grey); z-index: 200; }
+  #progress-bar { height: 100%; background: var(--gold); transition: width 0.4s ease; }
+
+  /* ══ STAGE ══ */
+  #stage { position: fixed; top: 0; left: var(--sidebar-w); right: 0; bottom: 0; overflow: hidden; }
+
+  .slide { position: absolute; inset: 0; display: none; overflow: hidden; }
+  .slide.active  { display: flex; animation: slideIn 0.35s ease forwards; }
+  .slide.leaving { display: flex; animation: slideOut 0.28s ease forwards; pointer-events: none; }
+
+  @keyframes slideIn  { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes slideOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-14px); } }
+
+  /* backgrounds */
+  .bg-black    { background: var(--black); }
+  .bg-charcoal { background: #161614; }
+  .bg-cream    { background: var(--cream); }
+  .bg-warm     { background: var(--warm-grey); }
+
+  /* ══ LAYOUTS ══ */
+  .l-center { width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 80px; }
+  .l-left   { width:100%; height:100%; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; padding:64px 72px; }
+  .l-split  { width:100%; height:100%; display:flex; }
+
+  /* dark/light split (contrast moments) */
+  .split-dark  { width:42%; flex-shrink:0; background:var(--black); border-right:1px solid #1e1e1e; padding:60px 48px; display:flex; flex-direction:column; justify-content:center; }
+  .split-light { flex:1; background:#EDEBE6; padding:60px 48px; display:flex; flex-direction:column; justify-content:center; }
+  .split-warm  { flex:1; background:var(--warm-grey); padding:60px 48px; display:flex; flex-direction:column; justify-content:center; }
+
+  /* cream/warm split (light slides) */
+  .split-cream { width:42%; flex-shrink:0; background:var(--cream); border-right:1px solid var(--warm-grey); padding:60px 48px; display:flex; flex-direction:column; justify-content:center; }
+
+  /* ══ TYPOGRAPHY ══ */
+  .eyebrow { font-family:'DM Sans',sans-serif; font-size:10px; font-weight:400; letter-spacing:0.24em; text-transform:uppercase; color:var(--gold); }
+
+  .t-hero { font-family:'Cormorant Garamond',Georgia,serif; font-weight:300; line-height:1.05; letter-spacing:-0.02em; color:var(--white); }
+  .t-hero.on-light { color: var(--text); }
+  .t-hero em { font-style:italic; color:var(--gold); }
+  .t-hero.on-light em { color:var(--gold); }
+
+  .t-xl { font-size:clamp(52px,7.5vw,88px); }
+  .t-lg { font-size:clamp(36px,5vw,58px); }
+  .t-md { font-size:clamp(26px,3.5vw,42px); }
+  .t-sm { font-size:clamp(20px,2.5vw,28px); }
+
+  .body-copy { font-family:'DM Sans',sans-serif; font-size:14px; font-weight:300; line-height:1.8; color:#b0b0ab; max-width:540px; }
+  .body-copy strong { color:var(--white); font-weight:400; }
+  .body-copy.on-light { color:var(--mid-grey); }
+  .body-copy.on-light strong { color:var(--text); font-weight:400; }
+
+  .gold-rule { width:48px; height:2px; background:var(--gold); flex-shrink:0; }
+
+  .corner-mark { position:absolute; bottom:28px; right:32px; font-family:'DM Sans',sans-serif; font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--mid-grey); }
+
+  /* ══ CARD GRID — white cards on warm-grey (light slides) ══ */
+  .card-grid { display:grid; gap:1px; background:var(--warm-grey); width:100%; margin-top:28px; }
+  .card-grid.cols-2 { grid-template-columns:1fr 1fr; }
+
+  .card { background:var(--white); padding:26px 26px 28px; display:flex; flex-direction:column; }
+  .card-num { font-family:'DM Sans',sans-serif; font-size:9px; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); opacity:0.85; margin-bottom:12px; }
+  .card-title { font-family:'Cormorant Garamond',Georgia,serif; font-size:21px; font-weight:400; color:var(--text); margin-bottom:8px; line-height:1.2; }
+  .card-body { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:300; color:var(--mid-grey); line-height:1.75; }
+
+  /* ══ TIMELINE (dark slides) ══ */
+  .timeline { display:flex; flex-direction:column; width:100%; }
+  .tl-item { display:grid; grid-template-columns:28px 1fr; gap:16px; position:relative; }
+  .tl-item:not(:last-child)::after { content:''; position:absolute; left:13px; top:28px; bottom:0; width:1px; background:#2a2a28; }
+  .tl-num { width:28px; height:28px; border-radius:50%; background:var(--black-deep); border:1px solid #3a3a35; display:flex; align-items:center; justify-content:center; font-family:'Cormorant Garamond',serif; font-size:12px; color:var(--gold); flex-shrink:0; position:relative; z-index:1; }
+  .tl-content { padding:3px 0 18px; }
+  .tl-title { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:400; color:var(--gold-light); margin-bottom:3px; line-height:1.2; }
+  .tl-desc { font-family:'DM Sans',sans-serif; font-size:11px; font-weight:300; color:#b0b0ab; line-height:1.6; }
+
+  /* ══ TRANSFORM TABLE (cream bg) ══ */
+  .transform-table { width:100%; border-collapse:collapse; margin-top:28px; }
+  .transform-table thead th { font-family:'DM Sans',sans-serif; font-size:9px; font-weight:500; letter-spacing:0.26em; text-transform:uppercase; padding:0 8px 14px 0; border-bottom:2px solid var(--text); text-align:left; }
+  .th-before { color:var(--mid-grey); width:43%; }
+  .th-arrow  { width:14%; text-align:center; color:transparent; }
+  .th-after  { color:var(--teal); width:43%; }
+  .transform-table tbody tr { border-bottom:1px solid var(--warm-grey); }
+  .transform-table tbody td { padding:13px 8px 13px 0; font-family:'Cormorant Garamond',serif; font-size:16px; line-height:1.35; vertical-align:middle; }
+  .td-before { color:var(--mid-grey); font-style:italic; }
+  .td-arrow  { text-align:center; color:var(--teal); font-style:normal; font-size:12px; opacity:0.5; }
+  .td-after  { color:var(--text); font-weight:500; font-style:normal; }
+  .transform-table tbody tr:last-child td { border-bottom:none; }
+
+  /* ══ STAT / INVEST (dark slides) ══ */
+  .stat-hero { font-family:'Cormorant Garamond',serif; font-size:clamp(60px,8vw,108px); font-weight:300; line-height:0.9; color:var(--gold); letter-spacing:-0.03em; }
+  .stat-label { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:#9a9a95; margin-top:8px; }
+
+  .invest-num { font-family:'Cormorant Garamond',serif; font-size:clamp(26px,3.2vw,42px); font-weight:300; color:var(--gold); line-height:1; letter-spacing:-0.02em; }
+  .invest-label { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:#9a9a95; margin-top:4px; }
+
+  /* ══ TEAL CALLOUT (cream slides) ══ */
+  .teal-callout { background:var(--teal-lt); border:1px solid var(--teal); border-left:3px solid var(--teal); border-radius:4px; padding:22px 28px; max-width:520px; }
+  .teal-callout-label { font-family:'DM Sans',sans-serif; font-size:9px; letter-spacing:0.26em; text-transform:uppercase; color:var(--teal); margin-bottom:8px; }
+  .teal-callout-text { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:400; color:var(--text); line-height:1.5; }
+
+  /* ══ TEAM GRID (cream) ══ */
+  .team-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; width:100%; margin-top:20px; background:var(--warm-grey); }
+  .team-card { background:var(--white); padding:22px 24px; display:flex; flex-direction:column; gap:7px; }
+  .team-name { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:500; color:var(--text); line-height:1.2; }
+  .team-role { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); }
+  .team-primary { font-family:'DM Sans',sans-serif; font-size:12px; font-weight:300; color:var(--mid-grey); line-height:1.5; }
+  .team-tagline { font-family:'Cormorant Garamond',serif; font-size:13px; font-style:italic; color:var(--gold); line-height:1.4; }
+
+  /* ══ PILL TAGS ══ */
+  .pill-group { display:flex; flex-wrap:wrap; gap:8px; }
+  .pill { display:inline-block; padding:5px 14px; border:1px solid var(--warm-grey); border-radius:100px; font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.1em; color:var(--mid-grey); }
+  .pill.dark { border-color:#4a4a45; color:#b0b0ab; }
+
+  /* ══ ITEM LIST with dot ══ */
+  .dot-list { display:flex; flex-direction:column; gap:0; }
+  .dot-list li { font-family:'DM Sans',sans-serif; font-size:13px; font-weight:300; color:var(--mid-grey); line-height:1.5; list-style:none; padding:9px 0; border-bottom:1px solid var(--warm-grey); display:flex; gap:12px; align-items:flex-start; }
+  .dot-list li:last-child { border-bottom:none; }
+  .dot-list li::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:6px; }
+  .dot-list.on-dark li { color:#b0b0ab; border-bottom-color:#2a2a28; }
+  .dot-list.on-dark li::before { background:var(--gold); }
+
+  /* ══ RETAINER TIERS (dark) ══ */
+  .retainer-row { display:flex; flex-direction:column; gap:1px; margin-top:14px; background:#1e1e1e; }
+  .retainer-item { background:var(--black-deep); padding:12px 16px; display:flex; justify-content:space-between; align-items:center; }
+  .retainer-tier { font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.16em; text-transform:uppercase; color:#9a9a95; }
+  .retainer-price { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:300; color:var(--gold-light); }
+
+  /* ══ NAV ARROWS ══ */
+  .nav-arrow { position:fixed; bottom:28px; z-index:190; background:none; border:1px solid var(--warm-grey); width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--mid-grey); font-size:14px; transition:border-color 0.25s, color 0.25s; }
+  .nav-arrow:hover { border-color:var(--gold); color:var(--gold); }
+  .nav-arrow.prev { right:82px; }
+  .nav-arrow.next { right:32px; }
+
+  /* ══ PRINT ══ */
+  @media print {
+    #sidebar, #counter, #progress, .nav-arrow { display: none !important; }
+    html, body { overflow: visible; height: auto; }
+    #stage { position: relative; left: 0; right: 0; width: 100%; min-height: auto; }
+    .slide { position: relative !important; inset: auto !important; width: 100%; height: 100vh; min-height: 100vh; display: flex !important; page-break-after: always; page-break-inside: avoid; animation: none !important; }
+    .slide:last-child { page-break-after: auto; }
+  }
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sidebar-brand">Tribal Mischief</div>
+  <div class="sidebar-nav" id="sidebar-nav"></div>
+  <div class="sidebar-footer" id="sidebar-footer">—</div>
+</nav>
+
+<div id="counter"><span class="cur" id="cur-num">1</span> / <span id="tot-num">13</span></div>
+<button class="nav-arrow prev" onclick="navigate(-1)">←</button>
+<button class="nav-arrow next" onclick="navigate(1)">→</button>
+<div id="progress"><div id="progress-bar"></div></div>
+
+<div id="stage">
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: INTRODUCTION
+  ───────────────────────────────────────── -->
+
+  <!-- 1 · Title -->
+  <section class="slide bg-cream" data-chapter="Introduction" data-title="Tribal Mischief">
+    <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+      <div style="position:absolute;right:-80px;bottom:-80px;width:480px;height:480px;border-radius:50%;border:1px solid var(--warm-grey);opacity:0.6;"></div>
+      <div style="position:absolute;right:-40px;bottom:-40px;width:300px;height:300px;border-radius:50%;border:1px solid var(--warm-grey);opacity:0.35;"></div>
+    </div>
+    <div class="l-left" style="position:relative;z-index:2;">
+      <div class="eyebrow" style="margin-bottom:28px;">Where Art Finds Audience</div>
+      <h1 class="t-hero on-light" style="font-size:clamp(64px,9vw,112px);line-height:0.92;">
+        Tribal<br><em>Mischief</em>
+      </h1>
+      <div class="gold-rule" style="margin:28px 0;"></div>
+      <p class="body-copy on-light" style="font-size:15px;max-width:500px;">
+        Building storytelling, systems, and digital infrastructure that help <strong>remarkable organizations be seen clearly.</strong>
+      </p>
+      <div style="margin-top:36px;padding-top:24px;border-top:1px solid var(--warm-grey);display:flex;gap:40px;flex-wrap:wrap;">
+        <div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid-grey);margin-bottom:5px;">Location</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--text);">Newburyport, MA</div>
+        </div>
+        <div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid-grey);margin-bottom:5px;">Approach</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--text);">Thoughtful disruption</div>
+        </div>
+        <div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid-grey);margin-bottom:5px;">Market</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--text);">Arts · Culture · Craft · Design</div>
+        </div>
+      </div>
+    </div>
+    <div class="corner-mark">Tribal Mischief</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: THE PROBLEM
+  ───────────────────────────────────────── -->
+
+  <!-- 2 · The Challenge -->
+  <section class="slide bg-black" data-chapter="The Problem" data-title="Invisible. Unheard. Misunderstood.">
+    <div class="l-center">
+      <div class="eyebrow" style="margin-bottom:20px;">The challenge</div>
+      <h1 class="t-hero t-xl">Invisible.<br><em>Unheard. Misunderstood.</em></h1>
+      <div class="gold-rule" style="margin:24px auto;"></div>
+      <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2vw,22px);color:#b0b0ab;font-style:italic;text-align:center;max-width:540px;line-height:1.65;">
+        Exceptional organizations lose audience, revenue, and trust not because the work is poor — but because their public presence can't keep pace with it.
+      </p>
+    </div>
+    <div class="corner-mark" style="color:#555;">01</div>
+  </section>
+
+  <!-- 3 · The Cost (split dark / light) -->
+  <section class="slide bg-black" data-chapter="The Problem" data-title="The Cost">
+    <div class="l-split">
+      <div class="split-dark">
+        <div class="eyebrow" style="margin-bottom:20px;">The reality</div>
+        <h2 class="t-hero t-md" style="line-height:1.25;margin-bottom:20px;">
+          Your presence<br>doesn't reflect<br><em>the work.</em>
+        </h2>
+        <div class="gold-rule" style="margin-bottom:20px;"></div>
+        <p class="body-copy">Most organizations don't have a messaging problem, a website problem, or a content problem in isolation. They have an <strong>alignment problem.</strong></p>
+      </div>
+      <div class="split-light">
+        <div class="eyebrow" style="color:var(--teal);margin-bottom:20px;">What it costs</div>
+        <ul class="dot-list">
+          <li>Missed revenue from discovery calls that don't convert</li>
+          <li>Inbound that skews low-budget or wrong-fit</li>
+          <li>Donor, funder, or partner trust that doesn't survive the website visit</li>
+          <li>Internal teams recreating the same communications every week</li>
+          <li>No reusable media library for events, press, or campaigns</li>
+          <li>A brand that consistently undersells the actual quality of the work</li>
+        </ul>
+      </div>
+    </div>
+    <div class="corner-mark" style="color:#7a7a75;">02</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: THE IDEA
+  ───────────────────────────────────────── -->
+
+  <!-- 4 · Where Art Finds Audience (cream statement) -->
+  <section class="slide bg-cream" data-chapter="The Idea" data-title="Where Art Finds Audience">
+    <div class="l-center">
+      <div class="eyebrow" style="margin-bottom:20px;">The core idea</div>
+      <h1 class="t-hero on-light" style="font-size:clamp(46px,6.5vw,80px);">
+        Where Art<br><em>Finds Audience</em>
+      </h1>
+      <div class="gold-rule" style="margin:24px auto;"></div>
+      <p class="body-copy on-light" style="text-align:center;max-width:520px;font-size:15px;">
+        Not a website refresh. Not a content strategy.<br>A complete communication system that makes your work <strong>impossible to ignore.</strong>
+      </p>
+      <div style="margin-top:28px;">
+        <p style="font-family:'Cormorant Garamond',serif;font-size:clamp(14px,1.6vw,18px);color:var(--mid-grey);font-style:italic;text-align:center;max-width:460px;line-height:1.7;">
+          "Mischief, to us, means thoughtful disruption — the small strategic interventions that help organizations escape outdated patterns without losing their identity."
+        </p>
+      </div>
+    </div>
+    <div class="corner-mark" style="color:var(--warm-grey);">03</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: OUR APPROACH
+  ───────────────────────────────────────── -->
+
+  <!-- 5 · Five Capabilities (cream grid) -->
+  <section class="slide bg-cream" data-chapter="Our Approach" data-title="Five Capabilities">
+    <div class="l-left">
+      <div class="eyebrow" style="margin-bottom:6px;">What we build together</div>
+      <h2 class="t-hero on-light t-sm" style="margin-bottom:4px;">Five capabilities. One unified system.</h2>
+      <div class="card-grid cols-2" style="max-width:720px;">
+        <div class="card">
+          <div class="card-num">01 — Story</div>
+          <div class="card-title">Narrative Discovery</div>
+          <div class="card-body">Identity, voice, and positioning extracted from leadership and embedded into every touchpoint.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">02 — Media</div>
+          <div class="card-title">Visual & Cultural Capture</div>
+          <div class="card-body">Photography, film, and documentary assets that show the work as it truly is — not how it's been described.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">03 — Systems</div>
+          <div class="card-title">Digital Infrastructure</div>
+          <div class="card-body">Website, CMS, and editorial platform built around how your organization actually operates.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">04 — Momentum</div>
+          <div class="card-title">Human-Led Workflow Systems</div>
+          <div class="card-body">Reusable voice guides, prompt libraries, editorial workflows, and staff training that make consistent communications achievable — without starting from scratch.</div>
+        </div>
+        <div class="card" style="grid-column:1 / -1;">
+          <div class="card-num">05 — Adoption</div>
+          <div class="card-title">Team Enablement</div>
+          <div class="card-body">Staff training, workflow documentation, and leadership alignment that ensure the system lives on after launch. The tools only work if your team understands and uses them.</div>
+        </div>
+      </div>
+    </div>
+    <div class="corner-mark">04</div>
+  </section>
+
+  <!-- 6 · What You Receive (split cream / warm) -->
+  <section class="slide bg-cream" data-chapter="Our Approach" data-title="What You Receive">
+    <div class="l-split">
+      <div class="split-cream" style="width:48%;">
+        <div class="eyebrow" style="margin-bottom:20px;">Core engagement</div>
+        <h2 class="t-hero on-light t-md" style="margin-bottom:6px;">What's <em>included</em></h2>
+        <div class="gold-rule" style="margin-bottom:20px;"></div>
+        <p class="body-copy on-light" style="margin-bottom:20px;">Every engagement delivers a complete communication system — narrative through adoption.</p>
+        <ul class="dot-list">
+          <li>Narrative & positioning system</li>
+          <li>Website architecture & CMS</li>
+          <li>Visual asset library (photography & film)</li>
+          <li>Editorial workflow documentation</li>
+          <li>Staff training & enablement</li>
+          <li>Launch package & communications plan</li>
+        </ul>
+      </div>
+      <div class="split-warm" style="flex:1;">
+        <div class="eyebrow" style="margin-bottom:20px;">Optional modules</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--text);font-style:italic;margin-bottom:20px;">Add what your engagement needs.</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="background:var(--white);padding:12px 16px;border-left:3px solid var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);">Short documentary film</div>
+          <div style="background:var(--white);padding:12px 16px;border-left:3px solid var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);">Campaign or event launch package</div>
+          <div style="background:var(--white);padding:12px 16px;border-left:3px solid var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);">Donor & funder storytelling package</div>
+          <div style="background:var(--white);padding:12px 16px;border-left:3px solid var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);">AI-assisted content operations</div>
+          <div style="background:var(--white);padding:12px 16px;border-left:3px solid var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);">CRM & email integration</div>
+          <div style="background:var(--white);padding:12px 16px;border-left:3px solid var(--warm-grey);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);">Ongoing editorial stewardship retainer</div>
+        </div>
+      </div>
+    </div>
+    <div class="corner-mark">05</div>
+  </section>
+
+  <!-- 7 · Example Engagement (warm, case study) -->
+  <section class="slide bg-warm" data-chapter="Our Approach" data-title="Sample Engagement">
+    <div style="width:100%;height:100%;display:flex;align-items:center;padding:56px 64px;gap:64px;">
+
+      <!-- Left: before/after columns -->
+      <div style="flex:1;min-width:0;">
+        <div class="eyebrow" style="margin-bottom:16px;">Sample engagement</div>
+        <h2 class="t-hero on-light t-sm" style="margin-bottom:4px;">Historic Arts Venue</h2>
+        <p style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;color:var(--mid-grey);letter-spacing:0.08em;margin-bottom:20px;">Illustrative engagement — representative of typical scope</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--warm-grey);margin-bottom:20px;">
+          <div style="background:var(--white);padding:18px 20px;">
+            <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--mid-grey);margin-bottom:12px;">Before</div>
+            <ul class="dot-list" style="gap:0;">
+              <li style="font-size:12px;padding:6px 0;">Outdated website with no clear conversion path</li>
+              <li style="font-size:12px;padding:6px 0;">Scattered photo archive, no usable media library</li>
+              <li style="font-size:12px;padding:6px 0;">Staff writing event copy from scratch each week</li>
+              <li style="font-size:12px;padding:6px 0;">No consistent brand voice across channels</li>
+              <li style="font-size:12px;padding:6px 0;border-bottom:none;">Donors and funders not finding the story</li>
+            </ul>
+          </div>
+          <div style="background:var(--white);padding:18px 20px;">
+            <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--teal);margin-bottom:12px;">After</div>
+            <ul class="dot-list" style="gap:0;">
+              <li style="font-size:12px;padding:6px 0;">New site with event, rental, and donor pathways</li>
+              <li style="font-size:12px;padding:6px 0;">Curated visual archive, CMS-ready for every need</li>
+              <li style="font-size:12px;padding:6px 0;">Reusable editorial workflows — publish in minutes</li>
+              <li style="font-size:12px;padding:6px 0;">Voice guide embedded in every template and tool</li>
+              <li style="font-size:12px;padding:6px 0;border-bottom:none;">Funder storytelling package, ready to deploy</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: outcomes -->
+      <div style="flex-shrink:0;width:220px;display:flex;flex-direction:column;gap:14px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;font-style:italic;color:var(--text);margin-bottom:6px;">Projected outcomes</div>
+        <div style="background:var(--white);padding:16px 18px;border-top:2px solid var(--gold);">
+          <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:300;color:var(--gold);line-height:1;">↑ 40%</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mid-grey);margin-top:4px;">Qualified inquiries</div>
+        </div>
+        <div style="background:var(--white);padding:16px 18px;border-top:2px solid var(--gold);">
+          <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:300;color:var(--gold);line-height:1;">8×</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mid-grey);margin-top:4px;">Faster content publishing</div>
+        </div>
+        <div style="background:var(--white);padding:16px 18px;border-top:2px solid var(--teal);">
+          <div style="font-family:'DM Sans',sans-serif;font-size:28px;font-weight:300;color:var(--teal);line-height:1;">Full</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--mid-grey);margin-top:4px;">Donor story package</div>
+        </div>
+        <p style="font-family:'DM Sans',sans-serif;font-size:10px;font-weight:300;color:var(--mid-grey);line-height:1.5;">Figures are illustrative targets based on comparable engagements.</p>
+      </div>
+
+    </div>
+    <div class="corner-mark">06</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: WHO WE SERVE
+  ───────────────────────────────────────── -->
+
+  <!-- 8 · Right Fit (split cream / warm) -->
+  <section class="slide bg-cream" data-chapter="Who We Serve" data-title="Who This Is For">
+    <div class="l-split">
+      <div class="split-cream" style="width:48%;">
+        <div class="eyebrow" style="margin-bottom:20px;">Our clients</div>
+        <h2 class="t-hero on-light t-lg" style="margin-bottom:20px;">Made for<br><em>makers.</em></h2>
+        <div class="gold-rule" style="margin-bottom:20px;"></div>
+        <p class="body-copy on-light" style="margin-bottom:20px;">Organizations that create exceptional work — and whose public presence doesn't yet match the quality of what they make.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+          <div style="padding:14px 18px;background:var(--white);border-left:3px solid var(--gold);">
+            <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Arts & Culture</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--text);">Theaters, museums, historic sites, music venues, festivals</div>
+          </div>
+          <div style="padding:14px 18px;background:var(--white);border-left:3px solid var(--gold);">
+            <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">Design & Architecture</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--text);">Architecture firms, landscape studios, exhibition designers, fabricators</div>
+          </div>
+          <div style="padding:14px 18px;background:var(--white);border-left:3px solid var(--gold);">
+            <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;">High-Craft Builders</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:13px;font-weight:300;color:var(--text);">Custom builders, boat builders, furniture makers, specialty studios</div>
+          </div>
+        </div>
+      </div>
+      <div class="split-warm">
+        <div class="eyebrow" style="margin-bottom:20px;">Right fit</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--text);font-style:italic;margin-bottom:20px;">For:</div>
+        <ul class="dot-list" style="margin-bottom:28px;">
+          <li>Organizations with excellent work and a weak public presence</li>
+          <li>Leaders ready to invest real time in discovery and clarity</li>
+          <li>Teams willing to adopt new workflows and systems</li>
+          <li>Budgets that reflect the value of the engagement</li>
+        </ul>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;color:var(--mid-grey);font-style:italic;margin-bottom:14px;">Not for:</div>
+        <ul style="display:flex;flex-direction:column;gap:0;">
+          <li style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);list-style:none;padding:8px 0;border-bottom:1px solid var(--warm-grey);display:flex;gap:12px;align-items:flex-start;"><span style="color:var(--mid-grey);opacity:0.5;flex-shrink:0;">—</span>Organizations seeking only a website or single deliverable</li>
+          <li style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);list-style:none;padding:8px 0;border-bottom:1px solid var(--warm-grey);display:flex;gap:12px;align-items:flex-start;"><span style="color:var(--mid-grey);opacity:0.5;flex-shrink:0;">—</span>Teams unwilling to participate in narrative discovery</li>
+          <li style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:var(--mid-grey);list-style:none;padding:8px 0;display:flex;gap:12px;align-items:flex-start;"><span style="color:var(--mid-grey);opacity:0.5;flex-shrink:0;">—</span>Organizations whose priority is price over transformation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="corner-mark">07</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: THE TEAM
+  ───────────────────────────────────────── -->
+
+  <!-- 9 · Team Model (cream) -->
+  <section class="slide bg-cream" data-chapter="The Team" data-title="Team Model">
+    <div class="l-left">
+      <div class="eyebrow" style="margin-bottom:4px;">A collaborative studio</div>
+      <h2 class="t-hero on-light t-sm" style="margin-bottom:6px;">One engagement. Four domains of expertise.</h2>
+      <p class="body-copy on-light" style="margin-bottom:0;max-width:560px;">Each partner leads a specific domain — combining <strong>strategy, storytelling, technology, and production</strong> within a single engagement rather than across four separate vendors.</p>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-name">Aidan Lewis</div>
+          <div class="team-role">Technical Lead</div>
+          <div class="team-primary">Systems and framework design · Digital infrastructure and workflows · AI tools and emerging technologies</div>
+          <div class="team-tagline">Durable, scalable, and technically sound.</div>
+        </div>
+        <div class="team-card">
+          <div class="team-name">Ethan Baird</div>
+          <div class="team-role">Narrative & Client Strategy</div>
+          <div class="team-primary">Leadership engagement · Sales and relationship development · Narrative, identity, and positioning</div>
+          <div class="team-tagline">Understanding the organization and translating craft into story.</div>
+        </div>
+        <div class="team-card">
+          <div class="team-name">Cole Crucial</div>
+          <div class="team-role">Creative Production Lead</div>
+          <div class="team-primary">Photography, film, and visual documentation · On-site production and media library build</div>
+          <div class="team-tagline">Professional storytelling and visual clarity.</div>
+        </div>
+        <div class="team-card">
+          <div class="team-name">Sean McCarthy</div>
+          <div class="team-role">Organizational Engagement</div>
+          <div class="team-primary">Internal team adoption · Workflow implementation · Narrative embedded into leadership communications</div>
+          <div class="team-tagline">Systems understood, adopted, and sustained internally.</div>
+        </div>
+      </div>
+    </div>
+    <div class="corner-mark">08</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: THE ENGAGEMENT
+  ───────────────────────────────────────── -->
+
+  <!-- 10 · Investment (dark, 3-layer model) -->
+  <section class="slide bg-black" data-chapter="The Engagement" data-title="Investment">
+    <div style="width:100%;height:100%;display:flex;align-items:center;padding:56px 60px;gap:64px;">
+
+      <!-- Left: Three layers -->
+      <div style="flex-shrink:0;width:300px;display:flex;flex-direction:column;gap:0;">
+        <div class="eyebrow" style="margin-bottom:20px;">Engagement model</div>
+
+        <!-- Layer 1 -->
+        <div style="padding-bottom:20px;border-bottom:1px solid #1e1e1e;margin-bottom:20px;">
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--teal);margin-bottom:8px;">Layer 1 — Start here</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300;color:var(--gold);letter-spacing:-0.02em;line-height:1;">$1,500 – $3,500</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#9a9a95;margin-top:4px;margin-bottom:8px;">Visibility & Systems Audit</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:#b0b0ab;line-height:1.6;">90-minute diagnostic review. Credited toward full engagement if you proceed.</div>
+        </div>
+
+        <!-- Layer 2 -->
+        <div style="padding-bottom:20px;border-bottom:1px solid #1e1e1e;margin-bottom:20px;">
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#9a9a95;margin-bottom:8px;">Layer 2 — Core transformation</div>
+          <div class="stat-hero" style="font-size:clamp(42px,5.5vw,68px);">$50–70k</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#9a9a95;margin-top:6px;margin-bottom:6px;">3–4 month engagement</div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:12px;font-weight:300;color:#b0b0ab;line-height:1.6;">Narrative through adoption. All five capabilities.</div>
+        </div>
+
+        <!-- Layer 3 -->
+        <div>
+          <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#9a9a95;margin-bottom:10px;">Layer 3 — Ongoing stewardship</div>
+          <div class="retainer-row">
+            <div class="retainer-item">
+              <div class="retainer-tier">Stewardship</div>
+              <div class="retainer-price">$750 / mo</div>
+            </div>
+            <div class="retainer-item">
+              <div class="retainer-tier">Momentum</div>
+              <div class="retainer-price">$1,500 / mo</div>
+            </div>
+            <div class="retainer-item">
+              <div class="retainer-tier">Growth Partner</div>
+              <div class="retainer-price">$2,500 / mo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Phases + Retainer detail -->
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:28px;">
+
+        <div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;color:#9a9a95;font-style:italic;margin-bottom:16px;">Five phases of transformation</div>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-num">I</div>
+              <div class="tl-content">
+                <div class="tl-title">Narrative & Identity Discovery</div>
+                <div class="tl-desc">Leadership interviews, story extraction, brand voice architecture</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-num">II</div>
+              <div class="tl-content">
+                <div class="tl-title">Visual & Cultural Capture</div>
+                <div class="tl-desc">On-site production, photography, film, archival media library</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-num">III</div>
+              <div class="tl-content">
+                <div class="tl-title">Digital Infrastructure Build</div>
+                <div class="tl-desc">Website, CMS, editorial platform, content architecture</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-num">IV</div>
+              <div class="tl-content">
+                <div class="tl-title">Momentum System</div>
+                <div class="tl-desc">Voice guides, prompt libraries, editorial workflows, content operations training</div>
+              </div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-num">V</div>
+              <div class="tl-content" style="padding-bottom:0;">
+                <div class="tl-title">Adoption & Enablement</div>
+                <div class="tl-desc">Staff training, workflow documentation, leadership alignment, launch</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid #1e1e1e;padding-top:20px;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:300;color:#9a9a95;font-style:italic;margin-bottom:12px;">What each retainer tier includes</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#1e1e1e;">
+            <div style="background:#0d0d0d;padding:14px 14px;">
+              <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Stewardship</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;color:#b0b0ab;line-height:1.6;">Quarterly strategy check-in · Light CMS support · Minor content updates</div>
+            </div>
+            <div style="background:#0d0d0d;padding:14px 14px;">
+              <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Momentum</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;color:#b0b0ab;line-height:1.6;">Monthly editorial planning · Workflow refinement · Analytics review</div>
+            </div>
+            <div style="background:#0d0d0d;padding:14px 14px;">
+              <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Growth Partner</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;color:#b0b0ab;line-height:1.6;">Ongoing content production · Campaign builds · Leadership messaging</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <div class="corner-mark" style="color:#555;">09</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: THE TRANSFORMATION
+  ───────────────────────────────────────── -->
+
+  <!-- 11 · Before & After (cream, full contrast table) -->
+  <section class="slide bg-cream" data-chapter="The Transformation" data-title="Before &amp; After">
+    <div class="l-left" style="padding:56px 64px;">
+      <div class="eyebrow" style="margin-bottom:6px;">The transformation</div>
+      <h2 class="t-hero on-light t-md" style="margin-bottom:0;">Where organizations arrive. Where they leave.</h2>
+      <table class="transform-table">
+        <thead>
+          <tr>
+            <th class="th-before">Before</th>
+            <th class="th-arrow"> </th>
+            <th class="th-after">After</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-before">Feeling invisible — excellent work, no audience</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">Seen clearly by exactly the right people</td>
+          </tr>
+          <tr>
+            <td class="td-before">Weak conversion — discovery calls that don't land</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">A presence that builds trust before the first meeting</td>
+          </tr>
+          <tr>
+            <td class="td-before">Manual, reactive communications</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">Systems that sustain momentum with less effort</td>
+          </tr>
+          <tr>
+            <td class="td-before">No reusable media, no consistent voice</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">A visual archive and voice guide your team actually uses</td>
+          </tr>
+          <tr>
+            <td class="td-before">An organization that feels misunderstood</td>
+            <td class="td-arrow">→</td>
+            <td class="td-after">A brand that finally feels like itself</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="corner-mark">10</div>
+  </section>
+
+  <!-- ─────────────────────────────────────
+       CHAPTER: NEXT STEPS
+  ───────────────────────────────────────── -->
+
+  <!-- 12 · Why Now (dark statement) -->
+  <section class="slide bg-black" data-chapter="Next Steps" data-title="Why Now">
+    <div style="width:100%;height:100%;display:flex;align-items:center;padding:60px 72px;gap:72px;">
+      <div style="flex-shrink:0;max-width:320px;">
+        <div class="eyebrow" style="margin-bottom:20px;">The moment</div>
+        <h2 class="t-hero t-lg" style="margin-bottom:20px;">
+          The organizations that <em>act now</em> will outpace those that wait.
+        </h2>
+        <div class="gold-rule"></div>
+      </div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:300;color:#9a9a95;font-style:italic;margin-bottom:18px;">Five reasons this conversation is better now than later:</div>
+        <ul class="dot-list on-dark">
+          <li>Attention is more fragmented than ever — clarity compounds over time</li>
+          <li>Digital presence ages quickly — what read as premium three years ago no longer does</li>
+          <li>Workflow systems built now create a permanent operational advantage</li>
+          <li>Audiences, funders, and clients expect clarity before they commit</li>
+          <li>Every month of misalignment is revenue, credibility, and momentum lost</li>
+        </ul>
+      </div>
+    </div>
+    <div class="corner-mark" style="color:#555;">11</div>
+  </section>
+
+  <!-- 13 · CTA (cream, audit offer) -->
+  <section class="slide bg-cream" data-chapter="Next Steps" data-title="Start Here">
+    <div class="l-center">
+      <div class="eyebrow" style="margin-bottom:20px;">Where art finds audience</div>
+      <h1 class="t-hero on-light" style="font-size:clamp(40px,5.5vw,68px);">
+        Your voice<br>deserves to be<br><em>heard.</em>
+      </h1>
+      <div class="gold-rule" style="margin:24px auto;"></div>
+      <div class="teal-callout" style="margin-top:4px;text-align:left;">
+        <div class="teal-callout-label">First step — Visibility & Systems Audit</div>
+        <div class="teal-callout-text">A 90-minute review of your current website, messaging, media, and workflows. We identify the highest-leverage transformation opportunities — and give you a clear roadmap whether or not you proceed.</div>
+        <div style="margin-top:14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:300;color:var(--teal);letter-spacing:0.08em;">$1,500 – $3,500 · Credited toward full engagement</div>
+      </div>
+      <div style="margin-top:20px;font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.28em;text-transform:uppercase;color:var(--mid-grey);">tribalmischief.com</div>
+    </div>
+    <div class="corner-mark">12</div>
+  </section>
+
+</div><!-- /stage -->
+
+<script>
+  const slides = Array.from(document.querySelectorAll('#stage .slide'));
+  let current = 0;
+  let animating = false;
+
+  // build sidebar
+  const chapters = {};
+  slides.forEach((s, i) => {
+    const ch = s.dataset.chapter;
+    const title = s.dataset.title;
+    if (!chapters[ch]) chapters[ch] = [];
+    chapters[ch].push({ index: i, title });
+  });
+
+  const nav = document.getElementById('sidebar-nav');
+
+  Object.entries(chapters).forEach(([name, items]) => {
+    const btn = document.createElement('button');
+    btn.className = 'nav-chapter';
+    btn.dataset.chapter = name;
+
+    const label = document.createElement('span');
+    label.className = 'nav-chapter-label';
+    label.innerHTML = `<span class="nav-dot"></span>${name}`;
+    btn.appendChild(label);
+
+    const list = document.createElement('div');
+    list.className = 'nav-slides';
+    items.forEach(item => {
+      const sb = document.createElement('button');
+      sb.className = 'nav-slide-btn';
+      sb.textContent = item.title;
+      sb.dataset.index = item.index;
+      sb.addEventListener('click', e => { e.stopPropagation(); goTo(item.index); });
+      list.appendChild(sb);
+    });
+    btn.appendChild(list);
+    btn.addEventListener('click', () => goTo(items[0].index));
+    nav.appendChild(btn);
+  });
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= slides.length || animating) return;
+    animating = true;
+
+    const prev = slides[current];
+    prev.classList.add('leaving');
+    prev.classList.remove('active');
+    setTimeout(() => prev.classList.remove('leaving'), 380);
+
+    current = idx;
+    slides[current].classList.add('active');
+    updateUI();
+    setTimeout(() => { animating = false; }, 400);
+  }
+
+  window.navigate = dir => goTo(current + dir);
+
+  function updateUI() {
+    const total = slides.length;
+    document.getElementById('cur-num').textContent = current + 1;
+    document.getElementById('tot-num').textContent = total;
+    document.getElementById('sidebar-footer').textContent = `${current + 1} of ${total}`;
+    document.getElementById('progress-bar').style.width = ((current + 1) / total * 100) + '%';
+
+    const curChapter = slides[current].dataset.chapter;
+    document.querySelectorAll('.nav-chapter').forEach(b => {
+      b.classList.toggle('active', b.dataset.chapter === curChapter);
+    });
+    document.querySelectorAll('.nav-slide-btn').forEach(b => {
+      b.classList.toggle('current', +b.dataset.index === current);
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight', 'ArrowDown', ' '].includes(e.key)) { e.preventDefault(); navigate(1); }
+    else if (['ArrowLeft', 'ArrowUp'].includes(e.key)) { e.preventDefault(); navigate(-1); }
+  });
+
+  slides[0].classList.add('active');
+  updateUI();
+</script>
+</body>
+</html>
